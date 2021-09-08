@@ -1,5 +1,6 @@
 package spring.project.forum.model;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import spring.project.forum.model.security.User;
@@ -28,10 +29,14 @@ public class PostAnswer{
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     private User author;
 
-    @ManyToMany
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_upvotedanswer",
             joinColumns = {@JoinColumn(name = "answer_id")},
@@ -39,7 +44,9 @@ public class PostAnswer{
     )
     private List<User> upVotes;
 
-    @ManyToMany
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_downvotedanswer",
             joinColumns = {@JoinColumn(name = "answer_id")},
@@ -47,8 +54,11 @@ public class PostAnswer{
     )
     private List<User> downVotes;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     private PostQuestion targetQuestion;
 
-    private Boolean isBestAnswer;
+    @Builder.Default
+    private Boolean isBestAnswer = false;
 }

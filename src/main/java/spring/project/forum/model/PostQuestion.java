@@ -1,13 +1,12 @@
 package spring.project.forum.model;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import spring.project.forum.model.security.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 
@@ -31,10 +30,14 @@ public class PostQuestion{
 
     private LocalDateTime closedAt;
 
-    @ManyToOne
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     private User author;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_upvotedquestion",
             joinColumns = {@JoinColumn(name = "question_id")},
@@ -42,7 +45,9 @@ public class PostQuestion{
     )
     private List<User> upVotes;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_downvotedquestion",
             joinColumns = {@JoinColumn(name = "question_id")},
@@ -50,9 +55,15 @@ public class PostQuestion{
     )
     private List<User> downVotes;
 
+
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @OneToMany(mappedBy = "targetQuestion", cascade = CascadeType.ALL)
+    private List<PostAnswer> answers;
+
+
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
     @OneToOne
     private PostAnswer bestAnswer;
-
-    @OneToMany(mappedBy = "targetQuestion", fetch = FetchType.EAGER)
-    private List<PostAnswer> answers;
 }
