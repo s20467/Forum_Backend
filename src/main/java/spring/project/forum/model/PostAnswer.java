@@ -29,12 +29,12 @@ public class PostAnswer{
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="username")
     @JsonIdentityReference(alwaysAsId=true)
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     private User author;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="username")
     @JsonIdentityReference(alwaysAsId=true)
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
@@ -44,7 +44,7 @@ public class PostAnswer{
     )
     private List<User> upVotes;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="username")
     @JsonIdentityReference(alwaysAsId=true)
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
