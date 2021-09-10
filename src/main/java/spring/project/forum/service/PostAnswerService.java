@@ -8,8 +8,11 @@ import java.util.List;
 public interface PostAnswerService {
     List<PostAnswer> getAll();
     Page<PostAnswer> getAll(Integer pageNum, Integer pageSize, String sortBy);
-    List<PostAnswer> getAnswersByQuestion(Integer questionId);
-    Page<PostAnswer> getAnswersByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy);
-    List<PostAnswer> getAnswersByAuthor(String username);
-    Page<PostAnswer> getAnswersByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy);
+    PostAnswer getById(Integer answerId);
+    PostAnswer deleteById(Integer answerId);
+    PostAnswer createAnswer(PostAnswer answer);
+    List<PostAnswer> getByQuestion(Integer questionId);
+    Page<PostAnswer> getByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy);
+    List<PostAnswer> getByAuthor(String username);
+    Page<PostAnswer> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy);
 }

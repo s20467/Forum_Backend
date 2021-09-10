@@ -50,7 +50,28 @@ public class PostAnswerServiceImpl implements PostAnswerService{
     }
 
     @Override
-    public Page<PostAnswer> getAnswersByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy) {
+    public PostAnswer getById(Integer answerId) {
+        return answerRepository.findById(answerId).orElseThrow(
+                () -> new ResourceNotFoundException("answer with id " + answerId + " not found")
+        );
+    }
+
+    @Override
+    public PostAnswer deleteById(Integer answerId) {
+        Optional<PostAnswer> answerOptional = answerRepository.findById(answerId);
+        if(answerOptional.isEmpty())
+            throw new ResourceNotFoundException("answer with id " + answerId + "not found");
+        answerRepository.deleteById(answerId);
+        return answerOptional.get();
+    }
+
+    @Override
+    public PostAnswer createAnswer(PostAnswer answer) {
+        return answerRepository.save(answer);
+    }
+
+    @Override
+    public Page<PostAnswer> getByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy) {
         PostQuestion foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
@@ -62,7 +83,7 @@ public class PostAnswerServiceImpl implements PostAnswerService{
     }
 
     @Override
-    public Page<PostAnswer> getAnswersByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy) {
+    public Page<PostAnswer> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy) {
         User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
@@ -74,13 +95,13 @@ public class PostAnswerServiceImpl implements PostAnswerService{
     }
 
     @Override
-    public List<PostAnswer> getAnswersByQuestion(Integer questionId) {
+    public List<PostAnswer> getByQuestion(Integer questionId) {
         PostQuestion foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
         return answerRepository.findAllByTargetQuestion(foundQuestion);
     }
 
     @Override
-    public List<PostAnswer> getAnswersByAuthor(String username) {
+    public List<PostAnswer> getByAuthor(String username) {
         User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         return answerRepository.findAllByAuthor(foundUser);
     }

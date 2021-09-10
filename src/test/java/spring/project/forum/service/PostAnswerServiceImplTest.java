@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
 import spring.project.forum.exception.IncorrectPageableException;
@@ -92,7 +90,60 @@ class PostAnswerServiceImplTest {
                 assertEquals(answers, foundAnswers);
             }
         }
+    }
 
+    @Nested
+    @DisplayName("get answer by id")
+    class getAnswerById{
+
+        @Test
+        @DisplayName(" - not existing answer id")
+        void getAnswerByIdWrongId(){
+            given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> answerService.getById(1));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void getAnswerByIdCorrect(){
+            PostAnswer answer = PostAnswer.builder().id(1).content("content1").build();
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer));
+
+            PostAnswer foundAnswer = answerService.getById(answer.getId());
+
+            assertEquals(answer, foundAnswer);
+        }
+    }
+
+    @Nested
+    @DisplayName("delete answer by id")
+    class deleteAnswerById{
+
+        @Test
+        @DisplayName(" - not existing answer id")
+        void deleteAnswerByIdWrongId(){
+            given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> answerService.getById(1));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void deleteAnswerByIdCorrect(){
+            PostAnswer answer = PostAnswer.builder().id(1).content("content1").build();
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer));
+
+            PostAnswer foundAnswer = answerService.deleteById(answer.getId());
+
+            assertEquals(answer, foundAnswer);
+        }
+    }
+
+    @Nested
+    @DisplayName("create answer")
+    class createAnswer{
+        //todo implement createAnswer method test when createAnswer gets more business logic
     }
 
     @Nested
@@ -108,7 +159,7 @@ class PostAnswerServiceImplTest {
             void getAnswersByQuestionWrongQuestionId() {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
-                assertThrows(ResourceNotFoundException.class, () -> answerService.getAnswersByQuestion(1));
+                assertThrows(ResourceNotFoundException.class, () -> answerService.getByQuestion(1));
             }
 
             @Test
@@ -119,7 +170,7 @@ class PostAnswerServiceImplTest {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new PostQuestion()));
                 given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(PostQuestion.class))).willReturn(answerPage);
 
-                Page<PostAnswer> resultAnswerPage = answerService.getAnswersByQuestion(1, 1, 1, "sort");
+                Page<PostAnswer> resultAnswerPage = answerService.getByQuestion(1, 1, 1, "sort");
 
                 assertEquals(resultAnswerPage, answerPage);
             }
@@ -134,7 +185,7 @@ class PostAnswerServiceImplTest {
             void getAnswersByQuestionPagedWrongQuestionId() {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
-                assertThrows(ResourceNotFoundException.class, () -> answerService.getAnswersByQuestion(1, 1, 1, "sort"));
+                assertThrows(ResourceNotFoundException.class, () -> answerService.getByQuestion(1, 1, 1, "sort"));
             }
 
             @Test
@@ -143,7 +194,7 @@ class PostAnswerServiceImplTest {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new PostQuestion()));
                 given(answerRepository.findAllByTargetQuestion(any(), any())).willThrow(propertyReferenceException);
 
-                assertThrows(IncorrectPageableException.class, () -> answerService.getAnswersByQuestion(1, 1, 1, "sort"));
+                assertThrows(IncorrectPageableException.class, () -> answerService.getByQuestion(1, 1, 1, "sort"));
             }
 
             @Test
@@ -154,7 +205,7 @@ class PostAnswerServiceImplTest {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new PostQuestion()));
                 given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(PostQuestion.class))).willReturn(answerPage);
 
-                Page<PostAnswer> resultAnswerPage = answerService.getAnswersByQuestion(1, 1, 1, "sort");
+                Page<PostAnswer> resultAnswerPage = answerService.getByQuestion(1, 1, 1, "sort");
 
                 assertEquals(resultAnswerPage, answerPage);
             }
@@ -175,7 +226,7 @@ class PostAnswerServiceImplTest {
             void getAnswersByAuthorWrongAuthorUsername() {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.empty());
 
-                assertThrows(ResourceNotFoundException.class, () -> answerService.getAnswersByAuthor("username"));
+                assertThrows(ResourceNotFoundException.class, () -> answerService.getByAuthor("username"));
             }
 
             @Test
@@ -187,7 +238,7 @@ class PostAnswerServiceImplTest {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(answerRepository.findAllByAuthor(any(User.class))).willReturn(answers);
 
-                List<PostAnswer> resultAnswers = answerService.getAnswersByAuthor("username");
+                List<PostAnswer> resultAnswers = answerService.getByAuthor("username");
 
                 assertEquals(resultAnswers, answers);
             }
@@ -202,7 +253,7 @@ class PostAnswerServiceImplTest {
             void getAnswersByAuthorPagedWrongAuthorUsername() {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.empty());
 
-                assertThrows(ResourceNotFoundException.class, () -> answerService.getAnswersByAuthor("username", 1, 1, "sort"));
+                assertThrows(ResourceNotFoundException.class, () -> answerService.getByAuthor("username", 1, 1, "sort"));
             }
 
             @Test
@@ -211,7 +262,7 @@ class PostAnswerServiceImplTest {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(answerRepository.findAllByAuthor(any(), any())).willThrow(propertyReferenceException);
 
-                assertThrows(IncorrectPageableException.class, () -> answerService.getAnswersByAuthor("username", 1, 1, "sort"));
+                assertThrows(IncorrectPageableException.class, () -> answerService.getByAuthor("username", 1, 1, "sort"));
             }
 
             @Test
@@ -222,7 +273,7 @@ class PostAnswerServiceImplTest {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(answerRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(answerPage);
 
-                Page<PostAnswer> resultAnswerPage = answerService.getAnswersByAuthor("username", 1, 1, "sortBy");
+                Page<PostAnswer> resultAnswerPage = answerService.getByAuthor("username", 1, 1, "sortBy");
 
                 assertEquals(resultAnswerPage, answerPage);
             }
