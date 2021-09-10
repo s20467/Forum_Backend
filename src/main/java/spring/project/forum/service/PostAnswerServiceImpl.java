@@ -71,6 +71,12 @@ public class PostAnswerServiceImpl implements PostAnswerService{
     }
 
     @Override
+    public List<PostAnswer> getByQuestion(Integer questionId) {
+        PostQuestion foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        return answerRepository.findAllByTargetQuestion(foundQuestion);
+    }
+
+    @Override
     public Page<PostAnswer> getByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy) {
         PostQuestion foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
@@ -83,6 +89,12 @@ public class PostAnswerServiceImpl implements PostAnswerService{
     }
 
     @Override
+    public List<PostAnswer> getByAuthor(String username) {
+        User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
+        return answerRepository.findAllByAuthor(foundUser);
+    }
+
+    @Override
     public Page<PostAnswer> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy) {
         User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
@@ -92,17 +104,5 @@ public class PostAnswerServiceImpl implements PostAnswerService{
         catch(PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
-    }
-
-    @Override
-    public List<PostAnswer> getByQuestion(Integer questionId) {
-        PostQuestion foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
-        return answerRepository.findAllByTargetQuestion(foundQuestion);
-    }
-
-    @Override
-    public List<PostAnswer> getByAuthor(String username) {
-        User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
-        return answerRepository.findAllByAuthor(foundUser);
     }
 }
