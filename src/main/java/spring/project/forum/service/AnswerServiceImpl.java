@@ -1,6 +1,7 @@
 package spring.project.forum.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import spring.project.forum.repository.AnswerRepository;
 import spring.project.forum.repository.QuestionRepository;
 import spring.project.forum.repository.security.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,22 +59,24 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
+    @Transactional
     public Answer deleteById(Integer answerId) {
-        Optional<Answer> answerOptional = answerRepository.findById(answerId);
-        if(answerOptional.isEmpty())
-            throw new ResourceNotFoundException("answer with id " + answerId + "not found");
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("answer with id " + answerId + "not found"));
+        if(answer.getIsBestAnswer()) {
+            Question targetQuestion = answer.getTargetQuestion();
+            targetQuestion.setBestAnswer(null);
+            questionRepository.save(targetQuestion);
+        }
         answerRepository.deleteById(answerId);
-        return answerOptional.get();
+        return answer;
     }
 
     @Override
-    public Answer createAnswer(Answer answer) {
-        return answerRepository.save(
-                Answer.builder()
-                        .content(answer.getContent())
-                        .author(null)//todo change author after security
-                        .build()
-        );
+    @Transactional
+    public Answer createAnswer(Integer questionId, Answer answer) {//todo change author after security
+        Question targetQuestion = questionRepository.getById(questionId);
+        Answer newAnswer = Answer.builder().content(answer.getContent()).targetQuestion(targetQuestion).author(null).build();
+        return answerRepository.save(newAnswer);
     }
 
     @Override
@@ -82,19 +86,19 @@ public class AnswerServiceImpl implements AnswerService {
         return answerRepository.save(updatedAnswer);
     }
 
-    @Override
-    public Answer setAsBestAnswer(Integer answerId) {
-        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
-        updatedAnswer.setIsBestAnswer(true);
-        return answerRepository.save(updatedAnswer);
-    }
-
-    @Override
-    public Answer unsetAsBestAnswer(Integer answerId) {
-        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
-        updatedAnswer.setIsBestAnswer(false);
-        return answerRepository.save(updatedAnswer);
-    }
+//    @Override
+//    public Answer setAsBestAnswer(Integer answerId) {
+//        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+//        updatedAnswer.setIsBestAnswer(true);
+//        return answerRepository.save(updatedAnswer);
+//    }
+//
+//    @Override
+//    public Answer unsetAsBestAnswer(Integer answerId) {
+//        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+//        updatedAnswer.setIsBestAnswer(false);
+//        return answerRepository.save(updatedAnswer);
+//    }
 
     @Override
     public Answer upVote(Integer answerId) {

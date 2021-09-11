@@ -12,9 +12,11 @@ import spring.project.forum.exception.ResourceNotFoundException;
 import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
+import spring.project.forum.repository.AnswerRepository;
 import spring.project.forum.repository.QuestionRepository;
 import spring.project.forum.repository.security.UserRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +25,12 @@ import java.util.Optional;
 public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, UserRepository userRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, AnswerRepository answerRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
         this.userRepository = userRepository;
     }
 
@@ -137,5 +141,28 @@ public class QuestionServiceImpl implements QuestionService {
         catch(PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public Question setBestAnswer(Integer questionId, Integer answerId) {
+        Question foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        Answer newBestAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        Answer oldBestAnswer = foundQuestion.getBestAnswer();
+        oldBestAnswer.setIsBestAnswer(false);
+        newBestAnswer.setIsBestAnswer(true);
+        answerRepository.save(oldBestAnswer);
+        return questionRepository.save(foundQuestion);
+    }
+
+    @Override
+    @Transactional
+    public Question unsetBestAnswer(Integer questionId) {
+        Question foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        Answer bestAnswer = foundQuestion.getBestAnswer();
+        foundQuestion.setBestAnswer(null);
+        bestAnswer.setIsBestAnswer(false);
+        answerRepository.save(bestAnswer);
+        return questionRepository.save(foundQuestion);
     }
 }

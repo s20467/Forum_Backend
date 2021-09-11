@@ -20,4 +20,6 @@ public interface QuestionService {
     Page<Question> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy);
     List<Question> getWithoutBestAnswer(String username);
     Page<Question> getWithoutBestAnswer(String username, Integer pageNum, Integer pageSize, String sortBy);
+    Question setBestAnswer(Integer questionId, Integer answerId);
+    Question unsetBestAnswer(Integer questionId);
 }
