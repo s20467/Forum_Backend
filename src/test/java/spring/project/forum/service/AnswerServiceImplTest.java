@@ -154,21 +154,21 @@ class AnswerServiceImplTest {
     @Nested
     @DisplayName("update answer content")
     class updateAnswerContent{
-        //todo implement updateAnswerContent method test when createAnswer gets more business logic
+        //todo implement updateAnswerContent method test when updateAnswerContent gets more business logic
     }
 
     @Disabled
     @Nested
     @DisplayName("set as best answer")
     class setAsBestAnswer{
-        //todo implement setAsBestAnswer method test when createAnswer gets more business logic
+        //todo implement setAsBestAnswer method test when setAsBestAnswer gets more business logic
     }
 
     @Disabled
     @Nested
     @DisplayName("unset as best answer")
     class unsetAsBestAnswer{
-        //todo implement unsetAsBestAnswer method test when createAnswer gets more business logic
+        //todo implement unsetAsBestAnswer method test when unsetAsBestAnswer gets more business logic
     }
 
     @Nested
