@@ -1,9 +1,6 @@
 package spring.project.forum.service;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -45,6 +42,21 @@ class QuestionServiceImplTest {
     @InjectMocks
     QuestionServiceImpl questionService;
 
+    Question question1;
+    Question question2;
+    Question closedQuestion1;
+    List<Question> listOfQuestions;
+    Page<Question> pageOfQuestions;
+
+    @BeforeEach
+    void setUp(){
+        question1 = Question.builder().id(1).title("title1").content("content1").build();
+        question2 = Question.builder().id(2).title("title2").content("content2").build();
+        closedQuestion1 = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
+        listOfQuestions = List.of(question1, question2);
+        pageOfQuestions = new PageImpl<>(listOfQuestions);
+    }
+
     @Nested
     @DisplayName("get all questions")
     class getAllQuestions{
@@ -56,14 +68,11 @@ class QuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllQuestionsCorrect(){
-                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
-                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
-                List<Question> questions = List.of(question1, question2);
-                given(questionRepository.findAll()).willReturn(questions);
+                given(questionRepository.findAll()).willReturn(listOfQuestions);
 
                 List<Question> foundQuestions = questionService.getAll();
 
-                assertEquals(questions, foundQuestions);
+                assertEquals(listOfQuestions, foundQuestions);
             }
         }
 
@@ -82,14 +91,11 @@ class QuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllQuestionsPagedCorrect(){
-                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
-                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
-                Page<Question> questions = new PageImpl<>(List.of(question1, question2));
-                given(questionRepository.findAll(any(Pageable.class))).willReturn(questions);
+                given(questionRepository.findAll(any(Pageable.class))).willReturn(pageOfQuestions);
 
                 Page<Question> foundQuestions = questionService.getAll(1, 1, "sort");
 
-                assertEquals(questions, foundQuestions);
+                assertEquals(pageOfQuestions, foundQuestions);
             }
         }
     }
@@ -109,12 +115,11 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void getQuestionByIdCorrect(){
-            Question question = Question.builder().id(1).title("title1").content("content1").build();
-            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
 
-            Question foundQuestion = questionService.getById(question.getId());
+            Question foundQuestion = questionService.getById(question1.getId());
 
-            assertEquals(question, foundQuestion);
+            assertEquals(question1, foundQuestion);
         }
     }
 
@@ -133,12 +138,11 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void deleteQuestionByIdCorrect(){
-            Question question = Question.builder().id(1).title("title1").content("content1").build();
-            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
 
-            Question deletedQuestion = questionService.deleteById(question.getId());
+            Question deletedQuestion = questionService.deleteById(question1.getId());
 
-            assertEquals(question, deletedQuestion);
+            assertEquals(question1, deletedQuestion);
         }
     }
 
@@ -163,8 +167,7 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - already closed")
         void closeQuestionAlreadyClosed(){
-            Question question = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
-            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(closedQuestion1));
 
             assertThrows(QuestionAlreadyClosedException.class, () -> questionService.closeQuestion(1));
         }
@@ -172,14 +175,12 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void closeQuestionCorrect(){
-            Question questionBefore = Question.builder().id(1).title("title1").content("content1").build();
-            Question questionAfter = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
-            given(questionRepository.findById(anyInt())).willReturn(Optional.of(questionBefore));
-            given(questionRepository.save(any(Question.class))).willReturn(questionAfter);
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(questionRepository.save(any(Question.class))).willReturn(closedQuestion1);
 
             Question foundQuestion = questionService.closeQuestion(1);
 
-            assertNotNull(questionAfter.getClosedAt());
+            assertNotNull(closedQuestion1.getClosedAt());
         }
     }
 
@@ -202,15 +203,12 @@ class QuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getQuestionsByAuthorCorrect() {
-                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
-                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
-                List<Question> questions = List.of(question1, question2);
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
-                given(questionRepository.findAllByAuthor(any(User.class))).willReturn(questions);
+                given(questionRepository.findAllByAuthor(any(User.class))).willReturn(listOfQuestions);
 
                 List<Question> resultQuestions = questionService.getByAuthor("username");
 
-                assertEquals(questions, resultQuestions);
+                assertEquals(listOfQuestions, resultQuestions);
             }
         }
 
@@ -238,15 +236,12 @@ class QuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getQuestionsByAuthorPagedCorrect() {
-                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
-                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
-                Page<Question> questionPage = new PageImpl<>(List.of(question1, question2));
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
-                given(questionRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(questionPage);
+                given(questionRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(pageOfQuestions);
 
                 Page<Question> resultQuestionPage = questionService.getByAuthor("username", 1, 1, "sortBy");
 
-                assertEquals(resultQuestionPage, questionPage);
+                assertEquals(pageOfQuestions, resultQuestionPage);
             }
         }
     }

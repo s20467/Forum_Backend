@@ -1,9 +1,6 @@
 package spring.project.forum.service;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -44,6 +41,19 @@ class AnswerServiceImplTest {
     @InjectMocks
     AnswerServiceImpl answerService;
 
+    Answer answer1;
+    Answer answer2;
+    List<Answer> listOfAnswers;
+    Page<Answer> pageOfAnswers;
+
+    @BeforeEach
+    void setUp(){
+        answer1 = Answer.builder().id(1).content("content1").build();
+        answer2 = Answer.builder().id(2).content("content2").build();
+        listOfAnswers = List.of(answer1, answer2);
+        pageOfAnswers = new PageImpl<>(listOfAnswers);
+    }
+
     @Nested
     @DisplayName("get all answers")
     class getAllAnswers{
@@ -55,14 +65,11 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllAnswersCorrect(){
-                Answer answer1 = Answer.builder().id(1).content("content1").build();
-                Answer answer2 = Answer.builder().id(2).content("content2").build();
-                List<Answer> answers = List.of(answer1, answer2);
-                given(answerRepository.findAll()).willReturn(answers);
+                given(answerRepository.findAll()).willReturn(listOfAnswers);
 
                 List<Answer> foundAnswers = answerService.getAll();
 
-                assertEquals(answers, foundAnswers);
+                assertEquals(listOfAnswers, foundAnswers);
             }
         }
 
@@ -81,14 +88,11 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllAnswersPagedCorrect(){
-                Answer answer1 = Answer.builder().id(1).content("content1").build();
-                Answer answer2 = Answer.builder().id(2).content("content2").build();
-                Page<Answer> answers = new PageImpl<>(List.of(answer1, answer2));
-                given(answerRepository.findAll(any(Pageable.class))).willReturn(answers);
+                given(answerRepository.findAll(any(Pageable.class))).willReturn(pageOfAnswers);
 
                 Page<Answer> foundAnswers = answerService.getAll(1, 1, "sort");
 
-                assertEquals(answers, foundAnswers);
+                assertEquals(pageOfAnswers, foundAnswers);
             }
         }
     }
@@ -108,12 +112,11 @@ class AnswerServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void getAnswerByIdCorrect(){
-            Answer answer = Answer.builder().id(1).content("content1").build();
-            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer));
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
 
-            Answer foundAnswer = answerService.getById(answer.getId());
+            Answer foundAnswer = answerService.getById(answer1.getId());
 
-            assertEquals(answer, foundAnswer);
+            assertEquals(answer1, foundAnswer);
         }
     }
 
@@ -132,12 +135,11 @@ class AnswerServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void deleteAnswerByIdCorrect(){
-            Answer answer = Answer.builder().id(1).content("content1").build();
-            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer));
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
 
-            Answer deletedAnswer = answerService.deleteById(answer.getId());
+            Answer deletedAnswer = answerService.deleteById(answer1.getId());
 
-            assertEquals(answer, deletedAnswer);
+            assertEquals(answer1, deletedAnswer);
         }
     }
 
@@ -167,14 +169,12 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAnswersByQuestionCorrect(){
-                Answer answer = Answer.builder().id(1).content("answer").build();
-                Page<Answer> answerPage = new PageImpl<>(List.of(answer));
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new Question()));
-                given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(answerPage);
+                given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(pageOfAnswers);
 
                 Page<Answer> resultAnswerPage = answerService.getByQuestion(1, 1, 1, "sort");
 
-                assertEquals(resultAnswerPage, answerPage);
+                assertEquals(pageOfAnswers, resultAnswerPage);
             }
         }
 
@@ -202,14 +202,12 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAnswersByQuestionPagedCorrect(){
-                Answer answer = Answer.builder().id(1).content("answer").build();
-                Page<Answer> answerPage = new PageImpl<>(List.of(answer));
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new Question()));
-                given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(answerPage);
+                given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(pageOfAnswers);
 
                 Page<Answer> resultAnswerPage = answerService.getByQuestion(1, 1, 1, "sort");
 
-                assertEquals(resultAnswerPage, answerPage);
+                assertEquals(pageOfAnswers, resultAnswerPage);
             }
         }
     }
@@ -234,15 +232,12 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAnswersByAuthorCorrect() {
-                Answer answer1 = Answer.builder().id(1).content("content1").build();
-                Answer answer2 = Answer.builder().id(2).content("content2").build();
-                List<Answer> answers = List.of(answer1, answer2);
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
-                given(answerRepository.findAllByAuthor(any(User.class))).willReturn(answers);
+                given(answerRepository.findAllByAuthor(any(User.class))).willReturn(listOfAnswers);
 
                 List<Answer> resultAnswers = answerService.getByAuthor("username");
 
-                assertEquals(resultAnswers, answers);
+                assertEquals(listOfAnswers, resultAnswers);
             }
         }
 
@@ -270,15 +265,12 @@ class AnswerServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAnswersByAuthorPagedCorrect() {
-                Answer answer1 = Answer.builder().id(1).content("content1").build();
-                Answer answer2 = Answer.builder().id(2).content("content2").build();
-                Page<Answer> answerPage = new PageImpl<>(List.of(answer1, answer2));
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
-                given(answerRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(answerPage);
+                given(answerRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(pageOfAnswers);
 
                 Page<Answer> resultAnswerPage = answerService.getByAuthor("username", 1, 1, "sortBy");
 
-                assertEquals(answerPage, resultAnswerPage);
+                assertEquals(pageOfAnswers, resultAnswerPage);
             }
         }
     }
