@@ -1,6 +1,7 @@
 package spring.project.forum.service;
 
 import org.springframework.data.domain.Page;
+import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 
 import java.util.List;
@@ -8,6 +9,9 @@ import java.util.List;
 public interface QuestionService {
     Question getById(Integer questionId);
     Question deleteById(Integer questionId);
+    Question updateQuestion(Integer questionId, Question question);
+    Question upVote(Integer questionId);
+    Question downVote(Integer questionId);
     List<Question> getAll();
     Page<Question> getAll(Integer pageNum, Integer pageSize, String sortBy);
     Question createQuestion(Question question);

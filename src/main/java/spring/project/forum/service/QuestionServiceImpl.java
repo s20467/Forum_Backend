@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.QuestionAlreadyClosedException;
 import spring.project.forum.exception.ResourceNotFoundException;
+import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
 import spring.project.forum.repository.QuestionRepository;
@@ -44,6 +45,26 @@ public class QuestionServiceImpl implements QuestionService {
             throw new ResourceNotFoundException("question with id " + questionId + "not found");
         questionRepository.deleteById(questionId);
         return questionOptional.get();
+    }
+
+    @Override
+    public Question updateQuestion(Integer questionId, Question question) {
+        Question updatedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        updatedQuestion.setTitle(question.getTitle());
+        updatedQuestion.setContent(question.getContent());
+        return questionRepository.save(updatedQuestion);
+    }
+
+    @Override
+    public Question upVote(Integer questionId) {
+        //todo implement after security
+        return null;
+    }
+
+    @Override
+    public Question downVote(Integer questionId) {
+        //todo implement after security
+        return null;
     }
 
     @Override

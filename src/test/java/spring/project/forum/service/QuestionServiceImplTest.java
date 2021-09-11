@@ -147,6 +147,13 @@ class QuestionServiceImplTest {
     }
 
     @Disabled
+    @Nested
+    @DisplayName("update question")
+    class updateQuestion{
+        //todo implement updateQuestion method test when updateQuestion gets more business logic
+    }
+
+    @Disabled
     @Test
     void createQuestion() {
         //todo implement after security
