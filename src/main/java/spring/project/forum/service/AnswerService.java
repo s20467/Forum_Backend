@@ -11,6 +11,11 @@ public interface AnswerService {
     Answer getById(Integer answerId);
     Answer deleteById(Integer answerId);
     Answer createAnswer(Answer answer);
+    Answer updateAnswerContent(Integer answerId, Answer answer);
+    Answer setAsBestAnswer(Integer answerId);
+    Answer unsetAsBestAnswer(Integer answerId);
+    Answer upVote(Integer answerId);
+    Answer downVote(Integer answerId);
     List<Answer> getByQuestion(Integer questionId);
     Page<Answer> getByQuestion(Integer questionId, Integer pageNum, Integer pageSize, String sortBy);
     List<Answer> getByAuthor(String username);

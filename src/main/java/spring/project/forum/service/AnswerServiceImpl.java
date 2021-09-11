@@ -67,7 +67,45 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public Answer createAnswer(Answer answer) {
-        return answerRepository.save(answer);
+        return answerRepository.save(
+                Answer.builder()
+                        .content(answer.getContent())
+                        .author(null)//todo change author after security
+                        .build()
+        );
+    }
+
+    @Override
+    public Answer updateAnswerContent(Integer answerId, Answer answer) {
+        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        updatedAnswer.setContent(answer.getContent());
+        return answerRepository.save(updatedAnswer);
+    }
+
+    @Override
+    public Answer setAsBestAnswer(Integer answerId) {
+        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        updatedAnswer.setIsBestAnswer(true);
+        return answerRepository.save(updatedAnswer);
+    }
+
+    @Override
+    public Answer unsetAsBestAnswer(Integer answerId) {
+        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        updatedAnswer.setIsBestAnswer(false);
+        return answerRepository.save(updatedAnswer);
+    }
+
+    @Override
+    public Answer upVote(Integer answerId) {
+        //todo implement after security
+        return null;
+    }
+
+    @Override
+    public Answer downVote(Integer answerId) {
+        //todo implement after security
+        return null;
     }
 
     @Override
