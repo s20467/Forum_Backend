@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "question")
-public class PostQuestion{
+public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -59,11 +59,11 @@ public class PostQuestion{
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @OneToMany(mappedBy = "targetQuestion", cascade = CascadeType.ALL)
-    private List<PostAnswer> answers;
+    private List<Answer> answers;
 
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @OneToOne
-    private PostAnswer bestAnswer;
+    private Answer bestAnswer;
 }

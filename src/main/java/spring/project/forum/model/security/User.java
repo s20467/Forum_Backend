@@ -2,8 +2,8 @@ package spring.project.forum.model.security;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
-import spring.project.forum.model.PostAnswer;
-import spring.project.forum.model.PostQuestion;
+import spring.project.forum.model.Answer;
+import spring.project.forum.model.Question;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,35 +28,35 @@ public class User {
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @OneToMany(mappedBy = "author", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostQuestion> askedQuestions;
+    private List<Question> askedQuestions;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @OneToMany(mappedBy = "author", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostAnswer> givenAnswers;
+    private List<Answer> givenAnswers;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @ManyToMany(mappedBy = "upVotes", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostQuestion> upVotedQuestions;
+    private List<Question> upVotedQuestions;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @ManyToMany(mappedBy = "upVotes", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostAnswer> upVotedAnswers;
+    private List<Answer> upVotedAnswers;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @ManyToMany(mappedBy = "downVotes", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostQuestion> downVotedQuestions;
+    private List<Question> downVotedQuestions;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @Singular
     @ManyToMany(mappedBy = "downVotes", cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<PostAnswer> downVotedAnswers;
+    private List<Answer> downVotedAnswers;
 }

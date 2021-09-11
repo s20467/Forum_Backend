@@ -6,9 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import spring.project.forum.model.security.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -18,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "answer")
-public class PostAnswer{
+public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -57,7 +55,7 @@ public class PostAnswer{
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    private PostQuestion targetQuestion;
+    private Question targetQuestion;
 
     @Builder.Default
     private Boolean isBestAnswer = false;

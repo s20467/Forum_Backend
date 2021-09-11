@@ -7,12 +7,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 import spring.project.forum.exception.IncorrectPageableException;
-import spring.project.forum.exception.PostQuestionAlreadyClosedException;
+import spring.project.forum.exception.QuestionAlreadyClosedException;
 import spring.project.forum.exception.ResourceNotFoundException;
-import spring.project.forum.model.PostAnswer;
-import spring.project.forum.model.PostQuestion;
+import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
-import spring.project.forum.repository.PostQuestionRepository;
+import spring.project.forum.repository.QuestionRepository;
 import spring.project.forum.repository.security.UserRepository;
 
 import java.time.LocalDateTime;
@@ -20,27 +19,27 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostQuestionServiceImpl implements PostQuestionService{
+public class QuestionServiceImpl implements QuestionService {
 
-    private final PostQuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
 
-    public PostQuestionServiceImpl(PostQuestionRepository questionRepository, UserRepository userRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
         this.userRepository = userRepository;
     }
 
     @Override
-    public PostQuestion getById(Integer questionId){
-        Optional<PostQuestion> questionOptional = questionRepository.findById(questionId);
+    public Question getById(Integer questionId){
+        Optional<Question> questionOptional = questionRepository.findById(questionId);
         if(questionOptional.isEmpty())
             throw new ResourceNotFoundException("Question with id " + questionId + " not found");
         return questionOptional.get();
     }
 
     @Override
-    public PostQuestion deleteById(Integer questionId) {
-        Optional<PostQuestion> questionOptional = questionRepository.findById(questionId);
+    public Question deleteById(Integer questionId) {
+        Optional<Question> questionOptional = questionRepository.findById(questionId);
         if(questionOptional.isEmpty())
             throw new ResourceNotFoundException("question with id " + questionId + "not found");
         questionRepository.deleteById(questionId);
@@ -48,12 +47,12 @@ public class PostQuestionServiceImpl implements PostQuestionService{
     }
 
     @Override
-    public List<PostQuestion> getAll() {
+    public List<Question> getAll() {
         return questionRepository.findAll();
     }
 
     @Override
-    public Page<PostQuestion> getAll(Integer pageNum, Integer pageSize, String sortBy) {
+    public Page<Question> getAll(Integer pageNum, Integer pageSize, String sortBy) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return questionRepository.findAll(pageable);
@@ -64,7 +63,7 @@ public class PostQuestionServiceImpl implements PostQuestionService{
     }
 
     @Override
-    public PostQuestion createQuestion(PostQuestion question) {
+    public Question createQuestion(Question question) {
         question.setClosedAt(null);
         question.setAnswers(null);
         question.setDownVotes(null);
@@ -74,25 +73,25 @@ public class PostQuestionServiceImpl implements PostQuestionService{
     }
 
     @Override
-    public PostQuestion closeQuestion(Integer questionId){
-        Optional<PostQuestion> questionOptional = questionRepository.findById(questionId);
+    public Question closeQuestion(Integer questionId){
+        Optional<Question> questionOptional = questionRepository.findById(questionId);
         if(questionOptional.isEmpty())
             throw new ResourceNotFoundException("Question with id " + questionId + " not found");
-        PostQuestion foundQuestion = questionOptional.get();
+        Question foundQuestion = questionOptional.get();
         if(foundQuestion.getClosedAt() != null)
-            throw new PostQuestionAlreadyClosedException("Question with id " + questionId + " has already been closed at " + foundQuestion.getClosedAt());
+            throw new QuestionAlreadyClosedException("Question with id " + questionId + " has already been closed at " + foundQuestion.getClosedAt());
         foundQuestion.setClosedAt(LocalDateTime.now());
         return questionRepository.save(foundQuestion);
     }
 
     @Override
-    public List<PostQuestion> getByAuthor(String username) {
+    public List<Question> getByAuthor(String username) {
         User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         return questionRepository.findAllByAuthor(foundUser);
     }
 
     @Override
-    public Page<PostQuestion> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy) {
+    public Page<Question> getByAuthor(String username, Integer pageNum, Integer pageSize, String sortBy) {
         User foundUser = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
@@ -104,12 +103,12 @@ public class PostQuestionServiceImpl implements PostQuestionService{
     }
 
     @Override
-    public List<PostQuestion> getWithoutBestAnswer(String username) {
+    public List<Question> getWithoutBestAnswer(String username) {
         return questionRepository.findAllByBestAnswerIsNull();
     }
 
     @Override
-    public Page<PostQuestion> getWithoutBestAnswer(String username, Integer pageNum, Integer pageSize, String sortBy) {
+    public Page<Question> getWithoutBestAnswer(String username, Integer pageNum, Integer pageSize, String sortBy) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return questionRepository.findAllByBestAnswerIsNull(pageable);

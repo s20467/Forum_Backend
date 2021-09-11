@@ -13,13 +13,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
 import spring.project.forum.exception.IncorrectPageableException;
-import spring.project.forum.exception.PostQuestionAlreadyClosedException;
+import spring.project.forum.exception.QuestionAlreadyClosedException;
 import spring.project.forum.exception.ResourceNotFoundException;
-import spring.project.forum.model.PostAnswer;
-import spring.project.forum.model.PostQuestion;
+import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
-import spring.project.forum.repository.PostAnswerRepository;
-import spring.project.forum.repository.PostQuestionRepository;
+import spring.project.forum.repository.AnswerRepository;
+import spring.project.forum.repository.QuestionRepository;
 import spring.project.forum.repository.security.UserRepository;
 
 import java.time.LocalDateTime;
@@ -32,19 +31,19 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class PostQuestionServiceImplTest {
+class QuestionServiceImplTest {
 
     @Mock
-    PostQuestionRepository questionRepository;
+    QuestionRepository questionRepository;
     @Mock
-    PostAnswerRepository answerRepository;
+    AnswerRepository answerRepository;
     @Mock
     UserRepository userRepository;
     @Mock
     PropertyReferenceException propertyReferenceException;
 
     @InjectMocks
-    PostQuestionServiceImpl questionService;
+    QuestionServiceImpl questionService;
 
     @Nested
     @DisplayName("get all questions")
@@ -57,12 +56,12 @@ class PostQuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllQuestionsCorrect(){
-                PostQuestion question1 = PostQuestion.builder().id(1).title("title1").content("content1").build();
-                PostQuestion question2 = PostQuestion.builder().id(2).title("title2").content("content2").build();
-                List<PostQuestion> questions = List.of(question1, question2);
+                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
+                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
+                List<Question> questions = List.of(question1, question2);
                 given(questionRepository.findAll()).willReturn(questions);
 
-                List<PostQuestion> foundQuestions = questionService.getAll();
+                List<Question> foundQuestions = questionService.getAll();
 
                 assertEquals(questions, foundQuestions);
             }
@@ -83,12 +82,12 @@ class PostQuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getAllQuestionsPagedCorrect(){
-                PostQuestion question1 = PostQuestion.builder().id(1).title("title1").content("content1").build();
-                PostQuestion question2 = PostQuestion.builder().id(2).title("title2").content("content2").build();
-                Page<PostQuestion> questions = new PageImpl<>(List.of(question1, question2));
+                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
+                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
+                Page<Question> questions = new PageImpl<>(List.of(question1, question2));
                 given(questionRepository.findAll(any(Pageable.class))).willReturn(questions);
 
-                Page<PostQuestion> foundQuestions = questionService.getAll(1, 1, "sort");
+                Page<Question> foundQuestions = questionService.getAll(1, 1, "sort");
 
                 assertEquals(questions, foundQuestions);
             }
@@ -110,10 +109,10 @@ class PostQuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void getQuestionByIdCorrect(){
-            PostQuestion question = PostQuestion.builder().id(1).title("title1").content("content1").build();
+            Question question = Question.builder().id(1).title("title1").content("content1").build();
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
 
-            PostQuestion foundQuestion = questionService.getById(question.getId());
+            Question foundQuestion = questionService.getById(question.getId());
 
             assertEquals(question, foundQuestion);
         }
@@ -134,10 +133,10 @@ class PostQuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void deleteQuestionByIdCorrect(){
-            PostQuestion question = PostQuestion.builder().id(1).title("title1").content("content1").build();
+            Question question = Question.builder().id(1).title("title1").content("content1").build();
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
 
-            PostQuestion deletedQuestion = questionService.deleteById(question.getId());
+            Question deletedQuestion = questionService.deleteById(question.getId());
 
             assertEquals(question, deletedQuestion);
         }
@@ -164,21 +163,21 @@ class PostQuestionServiceImplTest {
         @Test
         @DisplayName(" - already closed")
         void closeQuestionAlreadyClosed(){
-            PostQuestion question = PostQuestion.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
+            Question question = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question));
 
-            assertThrows(PostQuestionAlreadyClosedException.class, () -> questionService.closeQuestion(1));
+            assertThrows(QuestionAlreadyClosedException.class, () -> questionService.closeQuestion(1));
         }
 
         @Test
         @DisplayName(" - correct")
         void closeQuestionCorrect(){
-            PostQuestion questionBefore = PostQuestion.builder().id(1).title("title1").content("content1").build();
-            PostQuestion questionAfter = PostQuestion.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
+            Question questionBefore = Question.builder().id(1).title("title1").content("content1").build();
+            Question questionAfter = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(questionBefore));
-            given(questionRepository.save(any(PostQuestion.class))).willReturn(questionAfter);
+            given(questionRepository.save(any(Question.class))).willReturn(questionAfter);
 
-            PostQuestion foundQuestion = questionService.closeQuestion(1);
+            Question foundQuestion = questionService.closeQuestion(1);
 
             assertNotNull(questionAfter.getClosedAt());
         }
@@ -203,13 +202,13 @@ class PostQuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getQuestionsByAuthorCorrect() {
-                PostQuestion question1 = PostQuestion.builder().id(1).title("title1").content("content1").build();
-                PostQuestion question2 = PostQuestion.builder().id(2).title("title2").content("content2").build();
-                List<PostQuestion> questions = List.of(question1, question2);
+                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
+                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
+                List<Question> questions = List.of(question1, question2);
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(questionRepository.findAllByAuthor(any(User.class))).willReturn(questions);
 
-                List<PostQuestion> resultQuestions = questionService.getByAuthor("username");
+                List<Question> resultQuestions = questionService.getByAuthor("username");
 
                 assertEquals(questions, resultQuestions);
             }
@@ -239,13 +238,13 @@ class PostQuestionServiceImplTest {
             @Test
             @DisplayName(" - correct")
             void getQuestionsByAuthorPagedCorrect() {
-                PostQuestion question1 = PostQuestion.builder().id(1).title("title1").content("content1").build();
-                PostQuestion question2 = PostQuestion.builder().id(2).title("title2").content("content2").build();
-                Page<PostQuestion> questionPage = new PageImpl<>(List.of(question1, question2));
+                Question question1 = Question.builder().id(1).title("title1").content("content1").build();
+                Question question2 = Question.builder().id(2).title("title2").content("content2").build();
+                Page<Question> questionPage = new PageImpl<>(List.of(question1, question2));
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(questionRepository.findAllByAuthor(any(Pageable.class), any(User.class))).willReturn(questionPage);
 
-                Page<PostQuestion> resultQuestionPage = questionService.getByAuthor("username", 1, 1, "sortBy");
+                Page<Question> resultQuestionPage = questionService.getByAuthor("username", 1, 1, "sortBy");
 
                 assertEquals(resultQuestionPage, questionPage);
             }
