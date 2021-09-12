@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
+import spring.project.forum.api.v1.dto.AnswerDto;
+import spring.project.forum.api.v1.dto.QuestionDto;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.ResourceNotFoundException;
 import spring.project.forum.model.Answer;
@@ -43,6 +45,7 @@ class AnswerServiceImplTest {
 
     Answer answer1;
     Answer answer2;
+    AnswerDto answerDto1;
     List<Answer> listOfAnswers;
     Page<Answer> pageOfAnswers;
 
@@ -50,6 +53,7 @@ class AnswerServiceImplTest {
     void setUp(){
         answer1 = Answer.builder().id(1).content("content1").build();
         answer2 = Answer.builder().id(2).content("content2").build();
+        answerDto1 = AnswerDto.builder().content("contentDto1").build();
         listOfAnswers = List.of(answer1, answer2);
         pageOfAnswers = new PageImpl<>(listOfAnswers);
     }
@@ -137,9 +141,7 @@ class AnswerServiceImplTest {
         void deleteAnswerByIdCorrect(){
             given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
 
-            Answer deletedAnswer = answerService.deleteById(answer1.getId());
-
-            assertEquals(answer1, deletedAnswer);
+            answerService.deleteById(answer1.getId());
         }
     }
 
@@ -154,21 +156,25 @@ class AnswerServiceImplTest {
     @Nested
     @DisplayName("update answer content")
     class updateAnswerContent{
-        //todo implement updateAnswerContent method test when updateAnswerContent gets more business logic
-    }
 
-    @Disabled
-    @Nested
-    @DisplayName("set as best answer")
-    class setAsBestAnswer{
-        //todo implement setAsBestAnswer method test when setAsBestAnswer gets more business logic
-    }
+        @Test
+        @DisplayName(" - not existing answer id")
+        void updateAnswerWrongId(){
+            given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
 
-    @Disabled
-    @Nested
-    @DisplayName("unset as best answer")
-    class unsetAsBestAnswer{
-        //todo implement unsetAsBestAnswer method test when unsetAsBestAnswer gets more business logic
+            assertThrows(ResourceNotFoundException.class, () -> answerService.updateAnswerContent(1, new AnswerDto()));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void updateAnswerCorrect(){
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
+            given(answerRepository.save(any(Answer.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            Answer returnedAnswer = answerService.updateAnswerContent(answer1.getId(), answerDto1);
+
+            assertEquals(answerDto1.getContent(), returnedAnswer.getContent());
+        }
     }
 
     @Nested

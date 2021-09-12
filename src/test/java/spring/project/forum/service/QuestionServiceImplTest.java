@@ -9,9 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
+import spring.project.forum.api.v1.dto.QuestionDto;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.QuestionAlreadyClosedException;
 import spring.project.forum.exception.ResourceNotFoundException;
+import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
 import spring.project.forum.repository.AnswerRepository;
@@ -44,6 +46,9 @@ class QuestionServiceImplTest {
 
     Question question1;
     Question question2;
+    Answer answer1;
+    Answer answer2;
+    QuestionDto questionDto1;
     Question closedQuestion1;
     List<Question> listOfQuestions;
     Page<Question> pageOfQuestions;
@@ -52,6 +57,9 @@ class QuestionServiceImplTest {
     void setUp(){
         question1 = Question.builder().id(1).title("title1").content("content1").build();
         question2 = Question.builder().id(2).title("title2").content("content2").build();
+        answer1 = Answer.builder().id(1).content("content1").build();
+        answer2 = Answer.builder().id(2).content("content2").build();
+        questionDto1 = QuestionDto.builder().title("titleDto1").content("contentDto2").build();
         closedQuestion1 = Question.builder().id(1).title("title1").content("content1").closedAt(LocalDateTime.now()).build();
         listOfQuestions = List.of(question1, question2);
         pageOfQuestions = new PageImpl<>(listOfQuestions);
@@ -130,7 +138,7 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - not existing question id")
         void deleteQuestionByIdWrongId(){
-            given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
+            given(questionRepository.existsById(anyInt())).willReturn(false);
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.deleteById(1));
         }
@@ -138,19 +146,38 @@ class QuestionServiceImplTest {
         @Test
         @DisplayName(" - correct")
         void deleteQuestionByIdCorrect(){
-            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(questionRepository.existsById(anyInt())).willReturn(true);
 
-            Question deletedQuestion = questionService.deleteById(question1.getId());
-
-            assertEquals(question1, deletedQuestion);
+            questionService.deleteById(question1.getId());
         }
     }
 
-    @Disabled
     @Nested
     @DisplayName("update question")
     class updateQuestion{
-        //todo implement updateQuestion method test when updateQuestion gets more business logic
+
+        @Test
+        @DisplayName(" - not existing question id")
+        void updateQuestionWrongId(){
+            given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> questionService.updateQuestion(1, new QuestionDto()));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void updateQuestionCorrect(){
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(questionRepository.save(any(Question.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            Question returnedQuestion = questionService.updateQuestion(question1.getId(), questionDto1);
+
+            assertAll(
+                    () -> assertEquals(questionDto1.getTitle(), returnedQuestion.getTitle()),
+                    () -> assertEquals(questionDto1.getContent(), returnedQuestion.getContent()),
+                    () -> assertNull(returnedQuestion.getClosedAt())
+            );
+        }
     }
 
     @Disabled
@@ -268,6 +295,78 @@ class QuestionServiceImplTest {
         @DisplayName(" - paged")
         class getQuestionsByAuthorPaged{
             //todo implement getQuestionsByAuthorPaged method test when getQuestionsByAuthorPaged gets more business logic
+        }
+    }
+
+    @Nested
+    @DisplayName("set question best answer")
+    class setQuestionBestAnswer{
+
+        @Test
+        @DisplayName(" - not existing question id")
+        void setQuestionBestAnswerWrongQuestionId(){
+            given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> questionService.setBestAnswer(1, 1));
+        }
+
+        @Test
+        @DisplayName(" - not existing answer id")
+        void setQuestionBestAnswerWrongAnswerId(){
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> questionService.setBestAnswer(1, 1));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void setQuestionBestAnswerCorrect(){
+            Answer oldBestAnswer = answer1;
+            oldBestAnswer.setIsBestAnswer(true);
+            Answer newBestAnswer = answer2;
+            question1.setBestAnswer(oldBestAnswer);
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(answerRepository.findById(anyInt())).willReturn(Optional.of(newBestAnswer));
+            given(questionRepository.save(any(Question.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            Question returnedQuestion = questionService.setBestAnswer(question1.getId(), newBestAnswer.getId());
+
+            assertAll(
+                    () -> assertFalse(oldBestAnswer.getIsBestAnswer()),
+                    () -> assertTrue(newBestAnswer.getIsBestAnswer()),
+                    () -> assertEquals(newBestAnswer, returnedQuestion.getBestAnswer())
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("unset question best answer")
+    class unsetQuestionBestAnswer{
+
+        @Test
+        @DisplayName(" - not existing question id")
+        void unsetQuestionBestAnswerWrongQuestionId(){
+            given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> questionService.unsetBestAnswer(1));
+        }
+
+        @Test
+        @DisplayName(" - correct")
+        void unsetQuestionBestAnswerCorrect(){
+            Answer oldBestAnswer = answer1;
+            oldBestAnswer.setIsBestAnswer(true);
+            question1.setBestAnswer(oldBestAnswer);
+            given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
+            given(questionRepository.save(any(Question.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            Question returnedQuestion = questionService.unsetBestAnswer(question1.getId());
+
+            assertAll(
+                    () -> assertFalse(oldBestAnswer.getIsBestAnswer()),
+                    () -> assertNull(returnedQuestion.getBestAnswer())
+            );
         }
     }
 }
