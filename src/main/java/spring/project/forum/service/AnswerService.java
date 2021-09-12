@@ -1,6 +1,7 @@
 package spring.project.forum.service;
 
 import org.springframework.data.domain.Page;
+import spring.project.forum.api.v1.dto.AnswerDto;
 import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 
@@ -10,11 +11,9 @@ public interface AnswerService {
     List<Answer> getAll();
     Page<Answer> getAll(Integer pageNum, Integer pageSize, String sortBy);
     Answer getById(Integer answerId);
-    Answer deleteById(Integer answerId);
-    Answer createAnswer(Integer questionId, Answer answer);
-    Answer updateAnswerContent(Integer answerId, Answer answer);
-//    Answer setAsBestAnswer(Integer answerId);
-//    Answer unsetAsBestAnswer(Integer answerId);
+    void deleteById(Integer answerId);
+    Answer createAnswerForQuestion(Integer questionId, AnswerDto answerDto);
+    Answer updateAnswerContent(Integer answerId, AnswerDto answerDto);
     Answer upVote(Integer answerId);
     Answer downVote(Integer answerId);
     List<Answer> getByQuestion(Integer questionId);

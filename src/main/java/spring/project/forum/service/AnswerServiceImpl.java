@@ -1,13 +1,14 @@
 package spring.project.forum.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
+import spring.project.forum.api.v1.dto.AnswerDto;
+import spring.project.forum.api.v1.mapper.AnswerMapper;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.ResourceNotFoundException;
 import spring.project.forum.model.Answer;
@@ -19,7 +20,6 @@ import spring.project.forum.repository.security.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -28,11 +28,13 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
+    private final AnswerMapper answerMapper;
 
-    public AnswerServiceImpl(AnswerRepository answerRepository, QuestionRepository questionRepository, UserRepository userRepository) {
+    public AnswerServiceImpl(AnswerRepository answerRepository, QuestionRepository questionRepository, UserRepository userRepository, AnswerMapper answerMapper) {
         this.answerRepository = answerRepository;
         this.questionRepository = questionRepository;
         this.userRepository = userRepository;
+        this.answerMapper = answerMapper;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     @Transactional
-    public Answer deleteById(Integer answerId) {
+    public void deleteById(Integer answerId) {
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("answer with id " + answerId + "not found"));
         if(answer.getIsBestAnswer()) {
             Question targetQuestion = answer.getTargetQuestion();
@@ -68,37 +70,23 @@ public class AnswerServiceImpl implements AnswerService {
             questionRepository.save(targetQuestion);
         }
         answerRepository.deleteById(answerId);
-        return answer;
     }
 
     @Override
     @Transactional
-    public Answer createAnswer(Integer questionId, Answer answer) {//todo change author after security
+    public Answer createAnswerForQuestion(Integer questionId, AnswerDto answerDto) {//todo change author after security
         Question targetQuestion = questionRepository.getById(questionId);
-        Answer newAnswer = Answer.builder().content(answer.getContent()).targetQuestion(targetQuestion).author(null).build();
+        Answer newAnswer = answerMapper.answerDtoToAnswer(answerDto);
+        newAnswer.setTargetQuestion(targetQuestion);
         return answerRepository.save(newAnswer);
     }
 
     @Override
-    public Answer updateAnswerContent(Integer answerId, Answer answer) {
+    public Answer updateAnswerContent(Integer answerId, AnswerDto answerDto) {
         Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
-        updatedAnswer.setContent(answer.getContent());
+        updatedAnswer.setContent(answerDto.getContent());
         return answerRepository.save(updatedAnswer);
     }
-
-//    @Override
-//    public Answer setAsBestAnswer(Integer answerId) {
-//        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
-//        updatedAnswer.setIsBestAnswer(true);
-//        return answerRepository.save(updatedAnswer);
-//    }
-//
-//    @Override
-//    public Answer unsetAsBestAnswer(Integer answerId) {
-//        Answer updatedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
-//        updatedAnswer.setIsBestAnswer(false);
-//        return answerRepository.save(updatedAnswer);
-//    }
 
     @Override
     public Answer upVote(Integer answerId) {

@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
+import spring.project.forum.api.v1.dto.QuestionDto;
+import spring.project.forum.api.v1.mapper.QuestionMapper;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.QuestionAlreadyClosedException;
 import spring.project.forum.exception.ResourceNotFoundException;
@@ -27,11 +29,13 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
+    private final QuestionMapper questionMapper;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, AnswerRepository answerRepository, UserRepository userRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, AnswerRepository answerRepository, UserRepository userRepository, QuestionMapper questionMapper) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
+        this.questionMapper = questionMapper;
     }
 
     @Override
@@ -43,19 +47,17 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question deleteById(Integer questionId) {
-        Optional<Question> questionOptional = questionRepository.findById(questionId);
-        if(questionOptional.isEmpty())
+    public void deleteById(Integer questionId) {
+        if(!questionRepository.existsById(questionId))
             throw new ResourceNotFoundException("question with id " + questionId + "not found");
         questionRepository.deleteById(questionId);
-        return questionOptional.get();
     }
 
     @Override
-    public Question updateQuestion(Integer questionId, Question question) {
+    public Question updateQuestion(Integer questionId, QuestionDto questionDto) {
         Question updatedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
-        updatedQuestion.setTitle(question.getTitle());
-        updatedQuestion.setContent(question.getContent());
+        updatedQuestion.setTitle(questionDto.getTitle());
+        updatedQuestion.setContent(questionDto.getContent());
         return questionRepository.save(updatedQuestion);
     }
 
@@ -88,13 +90,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question createQuestion(Question question) {
-        question.setClosedAt(null);
-        question.setAnswers(null);
-        question.setDownVotes(null);
-        question.setBestAnswer(null);
-        question.setAuthor(null); //todo after security implementation change to logged user
-        return questionRepository.save(question);
+    @Transactional
+    public Question createQuestion(QuestionDto questionDto) { //todo after security implementation change author to logged user
+        Question newQuestion = questionMapper.questionDtoToQuestion(questionDto);
+//        newQuestion.setAuthor(...);
+        return questionRepository.save(newQuestion);
     }
 
     @Override
@@ -151,6 +151,7 @@ public class QuestionServiceImpl implements QuestionService {
         Answer oldBestAnswer = foundQuestion.getBestAnswer();
         oldBestAnswer.setIsBestAnswer(false);
         newBestAnswer.setIsBestAnswer(true);
+        foundQuestion.setBestAnswer(newBestAnswer);
         answerRepository.save(oldBestAnswer);
         return questionRepository.save(foundQuestion);
     }
