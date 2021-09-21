@@ -2,12 +2,17 @@ package spring.project.forum.bootstrap;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
+import spring.project.forum.model.security.Authority;
+import spring.project.forum.model.security.Role;
 import spring.project.forum.model.security.User;
 import spring.project.forum.repository.AnswerRepository;
 import spring.project.forum.repository.QuestionRepository;
+import spring.project.forum.repository.security.AuthorityRepository;
+import spring.project.forum.repository.security.RoleRepository;
 import spring.project.forum.repository.security.UserRepository;
 
 import java.util.List;
@@ -19,15 +24,45 @@ public class H2Bootstrap implements CommandLineRunner {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public H2Bootstrap(QuestionRepository questionRepository, AnswerRepository answerRepository, UserRepository userRepository) {
+    public H2Bootstrap(QuestionRepository questionRepository, AnswerRepository answerRepository, UserRepository userRepository, RoleRepository roleRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.authorityRepository = authorityRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
+
+//        Authority userQuestionCreateAuthority = Authority.builder().permission("user.question.create").build();
+//        Authority userQuestionUpdateAuthority = Authority.builder().permission("user.question.update").build();
+//        Authority userQuestionDeleteAuthority = Authority.builder().permission("user.question.delete").build();
+//        Authority userQuestionCloseAuthority = Authority.builder().permission("user.question.close").build();
+//        Authority userQuestionSetBestAnswerAuthority = Authority.builder().permission("user.question.set_best_answer").build();
+
+//        Authority adminQuestionCreateAuthority = Authority.builder().permission("admin.question.create").build();
+        Authority adminQuestionUpdateAuthority = Authority.builder().permission("admin.question.update").build();
+        Authority adminQuestionDeleteAuthority = Authority.builder().permission("admin.question.delete").build();
+        Authority adminQuestionCloseAuthority = Authority.builder().permission("admin.question.close").build();
+//        Authority adminQuestionSetBestAnswerAuthority = Authority.builder().permission("admin.question.set_best_answer").build();
+
+//        Authority userAnswerCreateAuthority = Authority.builder().permission("user.answer.create").build();
+//        Authority userAnswerUpdateAuthority = Authority.builder().permission("user.answer.update").build();
+//        Authority userAnswerDeleteAuthority = Authority.builder().permission("user.answer.delete").build();
+
+//        Authority adminAnswerCreateAuthority = Authority.builder().permission("admin.answer.create").build();
+        Authority adminAnswerUpdateAuthority = Authority.builder().permission("admin.answer.update").build();
+        Authority adminAnswerDeleteAuthority = Authority.builder().permission("admin.answer.delete").build();
+
+        Role userRole = Role.builder().name("ROLE_USER").build();
+        Role adminRole = Role.builder().name("ROLE_ADMIN").authorities(List.of(adminQuestionCloseAuthority, adminQuestionUpdateAuthority, adminQuestionDeleteAuthority, adminAnswerUpdateAuthority, adminAnswerDeleteAuthority)).build();
+
 
 
         Question q1 = Question.builder()
@@ -82,8 +117,9 @@ public class H2Bootstrap implements CommandLineRunner {
 
 
         User u1 = User.builder()
-                .username("user1")
-                .password("passs")
+                .username("user")
+                .password(passwordEncoder.encode("pass"))
+                .role(userRole)
                 .askedQuestion(q1)
                 .askedQuestion(q2)
                 .askedQuestion(q3)
@@ -105,6 +141,7 @@ public class H2Bootstrap implements CommandLineRunner {
         a3.setUpVotes(List.of(u1));
 
         userRepository.save(u1);
+        roleRepository.save(adminRole);
 
         //questionRepository.saveAll(Set.of(q1, q2));
     }
