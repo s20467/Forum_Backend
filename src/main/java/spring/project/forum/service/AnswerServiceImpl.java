@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import spring.project.forum.api.v1.dto.AnswerDto;
 import spring.project.forum.api.v1.mapper.AnswerMapper;
@@ -74,10 +75,13 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     @Transactional
-    public Answer createAnswerForQuestion(Integer questionId, AnswerDto answerDto) {//todo change author after security
+    public Answer createAnswerForQuestion(Integer questionId, AnswerDto answerDto) {
+        User author = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
         Question targetQuestion = questionRepository.getById(questionId);
         Answer newAnswer = answerMapper.answerDtoToAnswer(answerDto);
+        newAnswer.setAuthor(author);
         newAnswer.setTargetQuestion(targetQuestion);
+        author.getGivenAnswers().add(newAnswer);
         return answerRepository.save(newAnswer);
     }
 
@@ -90,14 +94,20 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public Answer upVote(Integer answerId) {
-        //todo implement after security
-        return null;
+        Answer upVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        User upVoter = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        upVoter.getUpVotedAnswers().add(upVotedAnswer);
+        upVotedAnswer.getUpVotes().add(upVoter);
+        return answerRepository.save(upVotedAnswer);
     }
 
     @Override
     public Answer downVote(Integer answerId) {
-        //todo implement after security
-        return null;
+        Answer downVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
+        User downVoter = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        downVoter.getDownVotedAnswers().add(downVotedAnswer);
+        downVotedAnswer.getDownVotes().add(downVoter);
+        return answerRepository.save(downVotedAnswer);
     }
 
     @Override

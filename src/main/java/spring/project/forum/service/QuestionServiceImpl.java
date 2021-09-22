@@ -1,10 +1,12 @@
 package spring.project.forum.service;
 
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import spring.project.forum.api.v1.dto.QuestionDto;
 import spring.project.forum.api.v1.mapper.QuestionMapper;
@@ -63,14 +65,20 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Question upVote(Integer questionId) {
-        //todo implement after security
-        return null;
+        Question upVotedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        User upVoter = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        upVoter.getUpVotedQuestions().add(upVotedQuestion);
+        upVotedQuestion.getUpVotes().add(upVoter);
+        return questionRepository.save(upVotedQuestion);
     }
 
     @Override
     public Question downVote(Integer questionId) {
-        //todo implement after security
-        return null;
+        Question downVotedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
+        User downVoter = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        downVoter.getDownVotedQuestions().add(downVotedQuestion);
+        downVotedQuestion.getDownVotes().add(downVoter);
+        return questionRepository.save(downVotedQuestion);
     }
 
     @Override
@@ -91,9 +99,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public Question createQuestion(QuestionDto questionDto) { //todo after security implementation change author to logged user
+    public Question createQuestion(QuestionDto questionDto) {
         Question newQuestion = questionMapper.questionDtoToQuestion(questionDto);
-//        newQuestion.setAuthor(...);
+        User author = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        newQuestion.setAuthor(author);
+        author.getAskedQuestions().add(newQuestion);
         return questionRepository.save(newQuestion);
     }
 
