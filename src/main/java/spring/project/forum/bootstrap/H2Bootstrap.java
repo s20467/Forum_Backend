@@ -16,6 +16,7 @@ import spring.project.forum.repository.security.RoleRepository;
 import spring.project.forum.repository.security.UserRepository;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Profile("h2")
@@ -40,28 +41,48 @@ public class H2Bootstrap implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-//        Authority userQuestionCreateAuthority = Authority.builder().permission("user.question.create").build();
+//        Authority questionCreateAuthority = Authority.builder().permission("question.create").build();
+//        Authority answerCreateAuthority = Authority.builder().permission("answer.create").build();
+
 //        Authority userQuestionUpdateAuthority = Authority.builder().permission("user.question.update").build();
 //        Authority userQuestionDeleteAuthority = Authority.builder().permission("user.question.delete").build();
 //        Authority userQuestionCloseAuthority = Authority.builder().permission("user.question.close").build();
-//        Authority userQuestionSetBestAnswerAuthority = Authority.builder().permission("user.question.set_best_answer").build();
+//        Authority userQuestionSetBestAnswerAuthority = Authority.builder().permission("user.question.set-best-answer").build();
 
-//        Authority adminQuestionCreateAuthority = Authority.builder().permission("admin.question.create").build();
         Authority adminQuestionUpdateAuthority = Authority.builder().permission("admin.question.update").build();
         Authority adminQuestionDeleteAuthority = Authority.builder().permission("admin.question.delete").build();
         Authority adminQuestionCloseAuthority = Authority.builder().permission("admin.question.close").build();
-//        Authority adminQuestionSetBestAnswerAuthority = Authority.builder().permission("admin.question.set_best_answer").build();
+        Authority adminQuestionSetBestAnswerAuthority = Authority.builder().permission("admin.question.set-unset-best-answer").build();
 
-//        Authority userAnswerCreateAuthority = Authority.builder().permission("user.answer.create").build();
 //        Authority userAnswerUpdateAuthority = Authority.builder().permission("user.answer.update").build();
 //        Authority userAnswerDeleteAuthority = Authority.builder().permission("user.answer.delete").build();
 
-//        Authority adminAnswerCreateAuthority = Authority.builder().permission("admin.answer.create").build();
         Authority adminAnswerUpdateAuthority = Authority.builder().permission("admin.answer.update").build();
         Authority adminAnswerDeleteAuthority = Authority.builder().permission("admin.answer.delete").build();
 
-        Role userRole = Role.builder().name("ROLE_USER").build();
-        Role adminRole = Role.builder().name("ROLE_ADMIN").authorities(List.of(adminQuestionCloseAuthority, adminQuestionUpdateAuthority, adminQuestionDeleteAuthority, adminAnswerUpdateAuthority, adminAnswerDeleteAuthority)).build();
+        Role userRole = Role.builder()
+                .name("ROLE_USER")
+                .authorities(List.of(
+//                        questionCreateAuthority,
+//                        userQuestionUpdateAuthority,
+//                        userQuestionDeleteAuthority,
+//                        userQuestionCloseAuthority,
+//                        userQuestionSetBestAnswerAuthority,
+//                        answerCreateAuthority,
+//                        userAnswerUpdateAuthority,
+//                        userAnswerDeleteAuthority
+                ))
+                .build();
+        Role adminRole = Role.builder()
+                .name("ROLE_ADMIN")
+                .authorities(List.of(
+                        adminQuestionCloseAuthority,
+                        adminQuestionUpdateAuthority,
+                        adminQuestionDeleteAuthority,
+                        adminAnswerUpdateAuthority,
+                        adminAnswerDeleteAuthority,
+                        adminQuestionSetBestAnswerAuthority
+                )).build();
 
 
 
@@ -131,6 +152,19 @@ public class H2Bootstrap implements CommandLineRunner {
                 .upVotedAnswer(a3)
                 .build();
 
+        User u2 = User.builder()
+                .username("user2")
+                .password(passwordEncoder.encode("pass"))
+                .role(userRole)
+                .build();
+
+        User admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("pass"))
+                .role(adminRole)
+                .role(userRole)
+                .build();
+
         q1.setAuthor(u1);
         q2.setAuthor(u1);
 
@@ -140,8 +174,7 @@ public class H2Bootstrap implements CommandLineRunner {
 
         a3.setUpVotes(List.of(u1));
 
-        userRepository.save(u1);
-        roleRepository.save(adminRole);
+        userRepository.saveAll(Set.of(u1, u2, admin));
 
         //questionRepository.saveAll(Set.of(q1, q2));
     }
