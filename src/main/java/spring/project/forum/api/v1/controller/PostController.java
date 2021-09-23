@@ -46,7 +46,7 @@ public class PostController {
         return questionService.getAll(pageNum, pageSize, sortBy);
     }
 
-    @PreAuthorize("hasAuthority('user.question.create')")
+    @PreAuthorize("isFullyAuthenticated()")
     @PostMapping("questions")
     @ResponseStatus(HttpStatus.CREATED)
     public Question createQuestion(@RequestBody QuestionDto questionDto){
