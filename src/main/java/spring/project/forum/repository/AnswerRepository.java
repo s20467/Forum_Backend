@@ -12,7 +12,10 @@ import java.util.List;
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
     Page<Answer> findAllByTargetQuestion(Pageable pageable, Question question);
+
     List<Answer> findAllByTargetQuestion(Question question);
+
     Page<Answer> findAllByAuthor(Pageable pageable, User user);
+
     List<Answer> findAllByAuthor(User user);
 }

@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public User create(UserCredentialsDto userCredentialsDto){
-        if(userRepository.findByUsername(userCredentialsDto.getUsername()).isPresent())
+    public User create(UserCredentialsDto userCredentialsDto) {
+        if (userRepository.findByUsername(userCredentialsDto.getUsername()).isPresent())
             throw new UsernameDuplicateException("User with username '" + userCredentialsDto.getUsername() + "' already exists");
 
         User user = userMapper.userCredentialsDtoToUser(userCredentialsDto);

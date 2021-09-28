@@ -11,19 +11,21 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
-    public void handleResourceNotFoundException(ResourceNotFoundException exc, WebRequest webRequest){}
+    public void handleResourceNotFoundException(ResourceNotFoundException exc, WebRequest webRequest) {
+    }
 
     @ExceptionHandler(QuestionAlreadyClosedException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Question already closed")
-    public void handleQuestionAlreadyClosedException(QuestionAlreadyClosedException exc, WebRequest webRequest){}
+    public void handleQuestionAlreadyClosedException(QuestionAlreadyClosedException exc, WebRequest webRequest) {
+    }
 
     @ExceptionHandler(IncorrectPageableException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Incorrect pagination arguments")
-    public void handleIncorrectPageableException(IncorrectPageableException exc, WebRequest webRequest){
+    public void handleIncorrectPageableException(IncorrectPageableException exc, WebRequest webRequest) {
     }
 
     @ExceptionHandler(UsernameDuplicateException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "User already exists")
-    public void handleUsernameDuplicateException(IncorrectPageableException exc, WebRequest webRequest){
+    public void handleUsernameDuplicateException(IncorrectPageableException exc, WebRequest webRequest) {
     }
 }

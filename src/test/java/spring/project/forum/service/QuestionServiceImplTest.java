@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +53,7 @@ class QuestionServiceImplTest {
     Page<Question> pageOfQuestions;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         question1 = Question.builder().id(1).title("title1").content("content1").build();
         question2 = Question.builder().id(2).title("title2").content("content2").build();
         answer1 = Answer.builder().id(1).content("content1").build();
@@ -67,15 +66,15 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("get all questions")
-    class getAllQuestions{
+    class getAllQuestions {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getAllQuestionsUnpaged{
+        class getAllQuestionsUnpaged {
 
             @Test
             @DisplayName(" - correct")
-            void getAllQuestionsCorrect(){
+            void getAllQuestionsCorrect() {
                 given(questionRepository.findAll()).willReturn(listOfQuestions);
 
                 List<Question> foundQuestions = questionService.getAll();
@@ -86,11 +85,11 @@ class QuestionServiceImplTest {
 
         @Nested
         @DisplayName(" - paged")
-        class getAllQuestionsPaged{
+        class getAllQuestionsPaged {
 
             @Test
             @DisplayName(" - incorrect pagination arguments")
-            void getAllQuestionsPagedIncorrectPaginationArguments(){
+            void getAllQuestionsPagedIncorrectPaginationArguments() {
                 given(questionRepository.findAll(any(Pageable.class))).willThrow(propertyReferenceException);
 
                 assertThrows(IncorrectPageableException.class, () -> questionService.getAll(1, 1, "sort"));
@@ -98,7 +97,7 @@ class QuestionServiceImplTest {
 
             @Test
             @DisplayName(" - correct")
-            void getAllQuestionsPagedCorrect(){
+            void getAllQuestionsPagedCorrect() {
                 given(questionRepository.findAll(any(Pageable.class))).willReturn(pageOfQuestions);
 
                 Page<Question> foundQuestions = questionService.getAll(1, 1, "sort");
@@ -110,11 +109,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("get question by id")
-    class getQuestionById{
+    class getQuestionById {
 
         @Test
         @DisplayName(" - not existing question id")
-        void getQuestionByIdWrongId(){
+        void getQuestionByIdWrongId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.getById(1));
@@ -122,7 +121,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void getQuestionByIdCorrect(){
+        void getQuestionByIdCorrect() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
 
             Question foundQuestion = questionService.getById(question1.getId());
@@ -133,11 +132,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("delete question by id")
-    class deleteQuestionById{
+    class deleteQuestionById {
 
         @Test
         @DisplayName(" - not existing question id")
-        void deleteQuestionByIdWrongId(){
+        void deleteQuestionByIdWrongId() {
             given(questionRepository.existsById(anyInt())).willReturn(false);
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.deleteById(1));
@@ -145,7 +144,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void deleteQuestionByIdCorrect(){
+        void deleteQuestionByIdCorrect() {
             given(questionRepository.existsById(anyInt())).willReturn(true);
 
             questionService.deleteById(question1.getId());
@@ -154,11 +153,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("update question")
-    class updateQuestion{
+    class updateQuestion {
 
         @Test
         @DisplayName(" - not existing question id")
-        void updateQuestionWrongId(){
+        void updateQuestionWrongId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.updateQuestion(1, new QuestionDto()));
@@ -166,7 +165,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void updateQuestionCorrect(){
+        void updateQuestionCorrect() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
             given(questionRepository.save(any(Question.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -188,11 +187,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("close question")
-    class closeQuestion{
+    class closeQuestion {
 
         @Test
         @DisplayName(" - not existing question id")
-        void closeQuestionWrongId(){
+        void closeQuestionWrongId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.closeQuestion(1));
@@ -200,7 +199,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - already closed")
-        void closeQuestionAlreadyClosed(){
+        void closeQuestionAlreadyClosed() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(closedQuestion1));
 
             assertThrows(QuestionAlreadyClosedException.class, () -> questionService.closeQuestion(1));
@@ -208,7 +207,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void closeQuestionCorrect(){
+        void closeQuestionCorrect() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
             given(questionRepository.save(any(Question.class))).willReturn(closedQuestion1);
 
@@ -220,11 +219,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("get questions by author")
-    class getQuestionsByAuthor{
+    class getQuestionsByAuthor {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getQuestionsByAuthorUnpaged{
+        class getQuestionsByAuthorUnpaged {
 
             @Test
             @DisplayName(" - not existing author username")
@@ -248,7 +247,7 @@ class QuestionServiceImplTest {
 
         @Nested
         @DisplayName(" - paged")
-        class getQuestionsByAuthorPaged{
+        class getQuestionsByAuthorPaged {
 
             @Test
             @DisplayName(" - not existing author username")
@@ -260,7 +259,7 @@ class QuestionServiceImplTest {
 
             @Test
             @DisplayName(" - incorrect pagination arguments")
-            void getQuestionsByAuthorPagedIncorrectPaginationArguments(){
+            void getQuestionsByAuthorPagedIncorrectPaginationArguments() {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(questionRepository.findAllByAuthor(any(), any())).willThrow(propertyReferenceException);
 
@@ -283,28 +282,28 @@ class QuestionServiceImplTest {
     @Disabled
     @Nested
     @DisplayName("get questions without best answer")
-    class getQuestionsWithoutBestAnswer{
+    class getQuestionsWithoutBestAnswer {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getQuestionsByAuthorUnpaged{
+        class getQuestionsByAuthorUnpaged {
             //todo implement getQuestionsByAuthorUnpaged method test when getQuestionsByAuthorUnpaged gets more business logic
         }
 
         @Nested
         @DisplayName(" - paged")
-        class getQuestionsByAuthorPaged{
+        class getQuestionsByAuthorPaged {
             //todo implement getQuestionsByAuthorPaged method test when getQuestionsByAuthorPaged gets more business logic
         }
     }
 
     @Nested
     @DisplayName("set question best answer")
-    class setQuestionBestAnswer{
+    class setQuestionBestAnswer {
 
         @Test
         @DisplayName(" - not existing question id")
-        void setQuestionBestAnswerWrongQuestionId(){
+        void setQuestionBestAnswerWrongQuestionId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.setBestAnswer(1, 1));
@@ -312,7 +311,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - not existing answer id")
-        void setQuestionBestAnswerWrongAnswerId(){
+        void setQuestionBestAnswerWrongAnswerId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.of(question1));
             given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
 
@@ -321,7 +320,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void setQuestionBestAnswerCorrect(){
+        void setQuestionBestAnswerCorrect() {
             Answer oldBestAnswer = answer1;
             oldBestAnswer.setIsBestAnswer(true);
             Answer newBestAnswer = answer2;
@@ -342,11 +341,11 @@ class QuestionServiceImplTest {
 
     @Nested
     @DisplayName("unset question best answer")
-    class unsetQuestionBestAnswer{
+    class unsetQuestionBestAnswer {
 
         @Test
         @DisplayName(" - not existing question id")
-        void unsetQuestionBestAnswerWrongQuestionId(){
+        void unsetQuestionBestAnswerWrongQuestionId() {
             given(questionRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> questionService.unsetBestAnswer(1));
@@ -354,7 +353,7 @@ class QuestionServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void unsetQuestionBestAnswerCorrect(){
+        void unsetQuestionBestAnswerCorrect() {
             Answer oldBestAnswer = answer1;
             oldBestAnswer.setIsBestAnswer(true);
             question1.setBestAnswer(oldBestAnswer);

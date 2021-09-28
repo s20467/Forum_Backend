@@ -34,14 +34,14 @@ public class UserController {
 
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(UserCredentialsDto userCredentialsDto){
+    public void register(UserCredentialsDto userCredentialsDto) {
         userService.create(userCredentialsDto);
     }
 
     @GetMapping("refresh-token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String token = authorizationHeader.substring("Bearer ".length());
                 User user = jwtService.getUserFromRefreshToken(token);
@@ -49,12 +49,10 @@ public class UserController {
                 Map<String, String> tokens = Map.of("access_token", new_access_token);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            }
-            catch(JWTVerificationException exception){
+            } catch (JWTVerificationException exception) {
                 JWTVerificationExceptionHandler.handleJWTVerificationException(exception, request, response);
             }
-        }
-        else {
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No refresh token attached in authorization header");
         }
     }

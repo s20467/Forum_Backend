@@ -69,9 +69,6 @@ public class H2Bootstrap implements CommandLineRunner {
         Authority adminRoleAuthority = Authority.builder().name("ROLE_ADMIN").build();
 
 
-
-
-
         Question q1 = Question.builder()
                 .title("example question title 1")
                 .content("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
@@ -120,7 +117,6 @@ public class H2Bootstrap implements CommandLineRunner {
         a1.setTargetQuestion(q1);
         a2.setTargetQuestion(q1);
         a3.setTargetQuestion(q2);
-
 
 
         User u1 = User.builder()

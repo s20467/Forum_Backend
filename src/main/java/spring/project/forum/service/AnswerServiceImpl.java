@@ -48,8 +48,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAll(pageable);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -65,7 +64,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public void deleteById(Integer answerId) {
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("answer with id " + answerId + "not found"));
-        if(answer.getIsBestAnswer()) {
+        if (answer.getIsBestAnswer()) {
             Question targetQuestion = answer.getTargetQuestion();
             targetQuestion.setBestAnswer(null);
             questionRepository.save(targetQuestion);
@@ -76,7 +75,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     @Transactional
     public Answer createAnswerForQuestion(Integer questionId, AnswerDto answerDto) {
-        User author = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        User author = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
         Question targetQuestion = questionRepository.getById(questionId);
         Answer newAnswer = answerMapper.answerDtoToAnswer(answerDto);
         newAnswer.setAuthor(author);
@@ -122,8 +121,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAllByTargetQuestion(pageable, foundQuestion);
-        }
-        catch(PropertyReferenceException exc){
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -140,8 +138,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAllByAuthor(pageable, foundUser);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }

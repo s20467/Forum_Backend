@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mapping.PropertyReferenceException;
 import spring.project.forum.api.v1.dto.AnswerDto;
-import spring.project.forum.api.v1.dto.QuestionDto;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.ResourceNotFoundException;
 import spring.project.forum.model.Answer;
@@ -23,10 +22,12 @@ import spring.project.forum.repository.security.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class AnswerServiceImplTest {
@@ -50,7 +51,7 @@ class AnswerServiceImplTest {
     Page<Answer> pageOfAnswers;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         answer1 = Answer.builder().id(1).content("content1").build();
         answer2 = Answer.builder().id(2).content("content2").build();
         answerDto1 = AnswerDto.builder().content("contentDto1").build();
@@ -60,15 +61,15 @@ class AnswerServiceImplTest {
 
     @Nested
     @DisplayName("get all answers")
-    class getAllAnswers{
+    class getAllAnswers {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getAllAnswersUnpaged{
+        class getAllAnswersUnpaged {
 
             @Test
             @DisplayName(" - correct")
-            void getAllAnswersCorrect(){
+            void getAllAnswersCorrect() {
                 given(answerRepository.findAll()).willReturn(listOfAnswers);
 
                 List<Answer> foundAnswers = answerService.getAll();
@@ -79,11 +80,11 @@ class AnswerServiceImplTest {
 
         @Nested
         @DisplayName(" - paged")
-        class getAllAnswersPaged{
+        class getAllAnswersPaged {
 
             @Test
             @DisplayName(" - incorrect pagination arguments")
-            void getAllAnswersPagedIncorrectPaginationArguments(){
+            void getAllAnswersPagedIncorrectPaginationArguments() {
                 given(answerRepository.findAll(any(Pageable.class))).willThrow(propertyReferenceException);
 
                 assertThrows(IncorrectPageableException.class, () -> answerService.getAll(1, 1, "sort"));
@@ -91,7 +92,7 @@ class AnswerServiceImplTest {
 
             @Test
             @DisplayName(" - correct")
-            void getAllAnswersPagedCorrect(){
+            void getAllAnswersPagedCorrect() {
                 given(answerRepository.findAll(any(Pageable.class))).willReturn(pageOfAnswers);
 
                 Page<Answer> foundAnswers = answerService.getAll(1, 1, "sort");
@@ -103,11 +104,11 @@ class AnswerServiceImplTest {
 
     @Nested
     @DisplayName("get answer by id")
-    class getAnswerById{
+    class getAnswerById {
 
         @Test
         @DisplayName(" - not existing answer id")
-        void getAnswerByIdWrongId(){
+        void getAnswerByIdWrongId() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> answerService.getById(1));
@@ -115,7 +116,7 @@ class AnswerServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void getAnswerByIdCorrect(){
+        void getAnswerByIdCorrect() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
 
             Answer foundAnswer = answerService.getById(answer1.getId());
@@ -126,11 +127,11 @@ class AnswerServiceImplTest {
 
     @Nested
     @DisplayName("delete answer by id")
-    class deleteAnswerById{
+    class deleteAnswerById {
 
         @Test
         @DisplayName(" - not existing answer id")
-        void deleteAnswerByIdWrongId(){
+        void deleteAnswerByIdWrongId() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> answerService.deleteById(1));
@@ -138,7 +139,7 @@ class AnswerServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void deleteAnswerByIdCorrect(){
+        void deleteAnswerByIdCorrect() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
 
             answerService.deleteById(answer1.getId());
@@ -148,18 +149,18 @@ class AnswerServiceImplTest {
     @Disabled
     @Nested
     @DisplayName("create answer")
-    class createAnswer{
+    class createAnswer {
         //todo implement createAnswer method test when createAnswer gets more business logic
     }
 
     @Disabled
     @Nested
     @DisplayName("update answer content")
-    class updateAnswerContent{
+    class updateAnswerContent {
 
         @Test
         @DisplayName(" - not existing answer id")
-        void updateAnswerWrongId(){
+        void updateAnswerWrongId() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.empty());
 
             assertThrows(ResourceNotFoundException.class, () -> answerService.updateAnswerContent(1, new AnswerDto()));
@@ -167,7 +168,7 @@ class AnswerServiceImplTest {
 
         @Test
         @DisplayName(" - correct")
-        void updateAnswerCorrect(){
+        void updateAnswerCorrect() {
             given(answerRepository.findById(anyInt())).willReturn(Optional.of(answer1));
             given(answerRepository.save(any(Answer.class))).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -179,11 +180,11 @@ class AnswerServiceImplTest {
 
     @Nested
     @DisplayName("get answers by question")
-    class getAnswersByQuestion{
+    class getAnswersByQuestion {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getAnswersByQuestionUnpaged{
+        class getAnswersByQuestionUnpaged {
 
             @Test
             @DisplayName(" - not existing question id")
@@ -195,7 +196,7 @@ class AnswerServiceImplTest {
 
             @Test
             @DisplayName(" - correct")
-            void getAnswersByQuestionCorrect(){
+            void getAnswersByQuestionCorrect() {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new Question()));
                 given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(pageOfAnswers);
 
@@ -207,7 +208,7 @@ class AnswerServiceImplTest {
 
         @Nested
         @DisplayName(" - paged")
-        class getAnswersByQuestionPaged{
+        class getAnswersByQuestionPaged {
 
             @Test
             @DisplayName(" - not existing question id")
@@ -219,7 +220,7 @@ class AnswerServiceImplTest {
 
             @Test
             @DisplayName(" - incorrect pagination arguments")
-            void getAnswersByQuestionPagedIncorrectPaginationArguments(){
+            void getAnswersByQuestionPagedIncorrectPaginationArguments() {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new Question()));
                 given(answerRepository.findAllByTargetQuestion(any(), any())).willThrow(propertyReferenceException);
 
@@ -228,7 +229,7 @@ class AnswerServiceImplTest {
 
             @Test
             @DisplayName(" - correct")
-            void getAnswersByQuestionPagedCorrect(){
+            void getAnswersByQuestionPagedCorrect() {
                 given(questionRepository.findById(anyInt())).willReturn(Optional.of(new Question()));
                 given(answerRepository.findAllByTargetQuestion(any(Pageable.class), any(Question.class))).willReturn(pageOfAnswers);
 
@@ -242,11 +243,11 @@ class AnswerServiceImplTest {
 
     @Nested
     @DisplayName("get answers by author")
-    class getAnswersByAuthor{
+    class getAnswersByAuthor {
 
         @Nested
         @DisplayName(" - unpaged")
-        class getAnswersByAuthorUnpaged{
+        class getAnswersByAuthorUnpaged {
 
             @Test
             @DisplayName(" - not existing author username")
@@ -270,7 +271,7 @@ class AnswerServiceImplTest {
 
         @Nested
         @DisplayName(" - paged")
-        class getAnswersByAuthorPaged{
+        class getAnswersByAuthorPaged {
 
             @Test
             @DisplayName(" - not existing author username")
@@ -282,7 +283,7 @@ class AnswerServiceImplTest {
 
             @Test
             @DisplayName(" - incorrect pagination arguments")
-            void getAnswersByAuthorPagedIncorrectPaginationArguments(){
+            void getAnswersByAuthorPagedIncorrectPaginationArguments() {
                 given(userRepository.findByUsername(anyString())).willReturn(Optional.of(new User()));
                 given(answerRepository.findAllByAuthor(any(), any())).willThrow(propertyReferenceException);
 

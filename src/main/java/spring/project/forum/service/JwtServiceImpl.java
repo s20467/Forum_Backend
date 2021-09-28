@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import spring.project.forum.model.security.Authority;
@@ -24,7 +23,7 @@ public class JwtServiceImpl implements JwtService {
         this.userService = userService;
     }
 
-    private Algorithm getAlgorithm(){
+    private Algorithm getAlgorithm() {
         return Algorithm.HMAC256("secret");
     }
 
@@ -48,15 +47,15 @@ public class JwtServiceImpl implements JwtService {
                     .sign(algorithm);
     }
 
-    public User getUserFromToken(String token) throws JWTVerificationException{
+    public User getUserFromToken(String token) throws JWTVerificationException {
         Algorithm algorithm = getAlgorithm();
         JWTVerifier jwtVerifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
-        if(!decodedJWT.getClaim("isAccessToken").asBoolean())
+        if (!decodedJWT.getClaim("isAccessToken").asBoolean())
             return null;
         String username = decodedJWT.getSubject();
         String[] authorities = decodedJWT.getClaim("authorities").asArray(String.class);
-        if(authorities == null)
+        if (authorities == null)
             return User.builder().username(username).build();
         else
             return User.builder()
@@ -70,12 +69,12 @@ public class JwtServiceImpl implements JwtService {
                     .build();
     }
 
-    public User getUserFromRefreshToken(String token) throws JWTVerificationException{
+    public User getUserFromRefreshToken(String token) throws JWTVerificationException {
         Algorithm algorithm = getAlgorithm();
         JWTVerifier jwtVerifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         String username = decodedJWT.getSubject();
-        return (User)userService.loadUserByUsername(username);
+        return (User) userService.loadUserByUsername(username);
     }
 
 }

@@ -1,6 +1,5 @@
 package spring.project.forum.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,16 +40,16 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question getById(Integer questionId){
+    public Question getById(Integer questionId) {
         Optional<Question> questionOptional = questionRepository.findById(questionId);
-        if(questionOptional.isEmpty())
+        if (questionOptional.isEmpty())
             throw new ResourceNotFoundException("Question with id " + questionId + " not found");
         return questionOptional.get();
     }
 
     @Override
     public void deleteById(Integer questionId) {
-        if(!questionRepository.existsById(questionId))
+        if (!questionRepository.existsById(questionId))
             throw new ResourceNotFoundException("question with id " + questionId + "not found");
         questionRepository.deleteById(questionId);
     }
@@ -66,7 +65,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Question upVote(Integer questionId) {
         Question upVotedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
-        User upVoter = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        User upVoter = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
         upVoter.getUpVotedQuestions().add(upVotedQuestion);
         upVotedQuestion.getUpVotes().add(upVoter);
         return questionRepository.save(upVotedQuestion);
@@ -75,7 +74,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Question downVote(Integer questionId) {
         Question downVotedQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
-        User downVoter = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        User downVoter = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
         downVoter.getDownVotedQuestions().add(downVotedQuestion);
         downVotedQuestion.getDownVotes().add(downVoter);
         return questionRepository.save(downVotedQuestion);
@@ -91,8 +90,7 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return questionRepository.findAll(pageable);
-        }
-        catch(PropertyReferenceException exc){
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -101,19 +99,19 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public Question createQuestion(QuestionDto questionDto) {
         Question newQuestion = questionMapper.questionDtoToQuestion(questionDto);
-        User author = userRepository.getById(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+        User author = userRepository.getById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
         newQuestion.setAuthor(author);
         author.getAskedQuestions().add(newQuestion);
         return questionRepository.save(newQuestion);
     }
 
     @Override
-    public Question closeQuestion(Integer questionId){
+    public Question closeQuestion(Integer questionId) {
         Optional<Question> questionOptional = questionRepository.findById(questionId);
-        if(questionOptional.isEmpty())
+        if (questionOptional.isEmpty())
             throw new ResourceNotFoundException("Question with id " + questionId + " not found");
         Question foundQuestion = questionOptional.get();
-        if(foundQuestion.getClosedAt() != null)
+        if (foundQuestion.getClosedAt() != null)
             throw new QuestionAlreadyClosedException("Question with id " + questionId + " has already been closed at " + foundQuestion.getClosedAt());
         foundQuestion.setClosedAt(LocalDateTime.now());
         return questionRepository.save(foundQuestion);
@@ -131,8 +129,7 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return questionRepository.findAllByAuthor(pageable, foundUser);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -147,8 +144,7 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return questionRepository.findAllByBestAnswerIsNull(pageable);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }

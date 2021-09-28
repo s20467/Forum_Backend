@@ -19,7 +19,7 @@ public class JWTVerificationExceptionHandler {
 
     public static void handleJWTVerificationException(JWTVerificationException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setHeader("error", exception.getMessage());
-        if(exception instanceof TokenExpiredException)
+        if (exception instanceof TokenExpiredException)
             response.setStatus(UNAUTHORIZED.value());
         else
             response.setStatus(FORBIDDEN.value());

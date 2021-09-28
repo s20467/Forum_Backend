@@ -1,6 +1,6 @@
 package spring.project.forum.exception;
 
-public class QuestionAlreadyClosedException extends RuntimeException{
+public class QuestionAlreadyClosedException extends RuntimeException {
     public QuestionAlreadyClosedException() {
     }
 

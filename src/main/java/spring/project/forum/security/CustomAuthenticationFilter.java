@@ -1,18 +1,14 @@
 package spring.project.forum.security;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import spring.project.forum.model.security.Authority;
 import spring.project.forum.model.security.User;
 import spring.project.forum.service.JwtService;
 
@@ -21,9 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -42,10 +35,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         try {
             String postObjectString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             ObjectMapper mapper = new ObjectMapper();
-            Map<String,Object> userCredentialsMap = mapper.readValue(postObjectString, Map.class);
+            Map<String, Object> userCredentialsMap = mapper.readValue(postObjectString, Map.class);
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userCredentialsMap.get("username"), userCredentialsMap.get("password")));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new AuthenticationCredentialsNotFoundException(e.getMessage());
         }
