@@ -21,4 +21,9 @@ public class ControllerExceptionHandler {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Incorrect pagination arguments")
     public void handleIncorrectPageableException(IncorrectPageableException exc, WebRequest webRequest){
     }
+
+    @ExceptionHandler(UsernameDuplicateException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT, reason = "User already exists")
+    public void handleUsernameDuplicateException(IncorrectPageableException exc, WebRequest webRequest){
+    }
 }
