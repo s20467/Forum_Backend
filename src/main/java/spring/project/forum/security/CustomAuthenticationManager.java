@@ -25,12 +25,12 @@ public class CustomAuthenticationManager {
     public boolean isQuestionOwner(Authentication authentication, Integer questionId){
         Question foundQuestion = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question with id " + questionId + " not found"));
         User authenticatedUser = (User)authentication.getPrincipal();
-        return foundQuestion.getAuthor().getId().equals(authenticatedUser.getId());
+        return foundQuestion.getAuthor().getUsername().equals(authenticatedUser.getUsername());
     }
 
     public boolean isAnswerOwner(Authentication authentication, Integer answerId){
         Answer foundAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
         User authenticatedUser = (User)authentication.getPrincipal();
-        return foundAnswer.getAuthor().getId().equals(authenticatedUser.getId());
+        return foundAnswer.getAuthor().getUsername().equals(authenticatedUser.getUsername());
     }
 }
