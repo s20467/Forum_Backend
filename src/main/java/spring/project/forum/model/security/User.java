@@ -74,22 +74,19 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean enabled = true;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @Singular
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
-            name = "user_role",
+            name = "user_authority",
             joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private List<Role> roles;
+            inverseJoinColumns = {@JoinColumn(name = "authority_id")})
+    private List<Authority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles
+        return authorities
                 .stream()
-                .map(Role::getAuthorities)
-                .flatMap(List::stream)
-                .map(authority -> new SimpleGrantedAuthority(authority.getPermission()))
+                .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                 .collect(Collectors.toList());
     }
 
