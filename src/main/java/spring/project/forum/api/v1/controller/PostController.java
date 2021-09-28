@@ -54,7 +54,7 @@ public class PostController {
         return questionService.createQuestion(questionDto);
     }
 
-    @PreAuthorize("hasAuthority('admin.question.close') or (isFullyAuthenticated() and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @GetMapping("questions/{questionId}/close")
     public Question closeQuestion(@PathVariable("questionId") Integer questionId) {
         return questionService.closeQuestion(questionId);
@@ -106,37 +106,37 @@ public class PostController {
         return answerService.downVote(answerId);
     }
 
-    @PreAuthorize("hasAuthority('admin.question.set-unset-best-answer') or (isFullyAuthenticated() and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @GetMapping("questions/{questionId}/set-best-answer/{answerId}")
     public Question setBestAnswer(@PathVariable("questionId") Integer questionId, @PathVariable("answerId") Integer answerId) {
         return questionService.setBestAnswer(questionId, answerId);
     }
 
-    @PreAuthorize("hasAuthority('admin.question.set-unset-best-answer') or (isFullyAuthenticated() and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @GetMapping("questions/{questionId}/unset-best-answer")
     public Question unsetBestAnswer(@PathVariable("questionId") Integer questionId) {
         return questionService.unsetBestAnswer(questionId);
     }
 
-    @PreAuthorize("hasAuthority('admin.question.delete') or (isFullyAuthenticated() and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER')) and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @DeleteMapping("questions/{questionId}")
     public void deleteQuestion(@PathVariable("questionId") Integer questionId) {
         questionService.deleteById(questionId);
     }
 
-    @PreAuthorize("hasAuthority('admin.answer.delete') or (isFullyAuthenticated() and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
     @DeleteMapping("answers/{answerId}")
     public void deleteAnswer(@PathVariable("answerId") Integer answerId) {
         answerService.deleteById(answerId);
     }
 
-    @PreAuthorize("hasAuthority('admin.question.update') or (isFullyAuthenticated() and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @PatchMapping("questions/{questionId}")
     public Question updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDto questionDto) {
         return questionService.updateQuestion(questionId, questionDto);
     }
 
-    @PreAuthorize("hasAuthority('admin.answer.update') or (isFullyAuthenticated() and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
+    @PreAuthorize("hasRole('USER') or (hasRole('USER') and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
     @PatchMapping("answers/{answerId}")
     public Answer updateAnswer(@PathVariable("answerId") Integer answerId, @RequestBody AnswerDto answerDto) {
         return answerService.updateAnswerContent(answerId, answerDto);
