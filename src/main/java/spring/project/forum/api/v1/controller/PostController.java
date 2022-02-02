@@ -30,19 +30,19 @@ public class PostController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions/{questionId}")
-    public Question getQuestionById(@PathVariable("questionId") Integer id){
+    public Question getQuestionById(@PathVariable("questionId") Integer id) {
         return questionService.getById(id);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("answers/{answerId}")
-    public Answer getAnswerById(@PathVariable("answerId") Integer id){
+    public Answer getAnswerById(@PathVariable("answerId") Integer id) {
         return answerService.getById(id);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions")
-    public List<Question> getQuestions(){
+    public List<Question> getQuestions() {
         return questionService.getAll();
     }
 
@@ -51,33 +51,33 @@ public class PostController {
     public Page<Question> getQuestions(
             @RequestParam("page") Integer pageNum,
             @RequestParam("limit") Integer pageSize,
-            @RequestParam("sort") String sortBy){
+            @RequestParam("sort") String sortBy) {
         return questionService.getAll(pageNum, pageSize, sortBy);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("questions/admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public Question createQuestionAdmin(@Valid @RequestBody QuestionDtoAdmin questionDtoAdmin){
+    public Question createQuestionAdmin(@Valid @RequestBody QuestionDtoAdmin questionDtoAdmin) {
         return questionService.createQuestionAdmin(questionDtoAdmin);
     }
 
     @PreAuthorize("isFullyAuthenticated()")
     @PostMapping("questions")
     @ResponseStatus(HttpStatus.CREATED)
-    public Question createQuestion(@Valid @RequestBody QuestionDto questionDto){
+    public Question createQuestion(@Valid @RequestBody QuestionDto questionDto) {
         return questionService.createQuestion(questionDto);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @PostMapping("questions/{questionId}/close")
-    public Question closeQuestion(@PathVariable("questionId") Integer questionId){
+    public Question closeQuestion(@PathVariable("questionId") Integer questionId) {
         return questionService.closeQuestion(questionId);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @PostMapping("questions/{questionId}/open")
-    public Question openQuestion(@PathVariable("questionId") Integer questionId){
+    public Question openQuestion(@PathVariable("questionId") Integer questionId) {
         return questionService.openQuestion(questionId);
     }
 
@@ -87,31 +87,31 @@ public class PostController {
             @PathVariable("questionId") Integer questionId,
             @RequestParam("page") Integer pageNum,
             @RequestParam("limit") Integer pageSize,
-            @RequestParam("sort") String sortBy){
+            @RequestParam("sort") String sortBy) {
         return answerService.getByQuestion(questionId, pageNum, pageSize, sortBy);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions/{questionId}/answers")
-    public List<Answer> getAnswersForQuestion(@PathVariable("questionId") Integer questionId){
+    public List<Answer> getAnswersForQuestion(@PathVariable("questionId") Integer questionId) {
         return answerService.getByQuestion(questionId);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions/not-closed")
-    public List<Question> getNotClosedQuestions(){
+    public List<Question> getNotClosedQuestions() {
         return questionService.getNotClosed();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("questions/{questionId}/give-answer/admin")
-    public Answer giveAnswerAdmin(@PathVariable("questionId") Integer questionId, @Valid @RequestBody AnswerDtoAdmin answerDtoAdmin){
+    public Answer giveAnswerAdmin(@PathVariable("questionId") Integer questionId, @Valid @RequestBody AnswerDtoAdmin answerDtoAdmin) {
         return answerService.createAnswerForQuestionAdmin(questionId, answerDtoAdmin);
     }
 
     @PreAuthorize("isFullyAuthenticated()")
     @PostMapping("questions/{questionId}/give-answer")
-    public Answer giveAnswer(@PathVariable("questionId") Integer questionId, @Valid @RequestBody AnswerDto answerDto){
+    public Answer giveAnswer(@PathVariable("questionId") Integer questionId, @Valid @RequestBody AnswerDto answerDto) {
         return answerService.createAnswerForQuestion(questionId, answerDto);
     }
 
@@ -177,49 +177,49 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @DeleteMapping("questions/{questionId}")
-    public void deleteQuestion(@PathVariable("questionId") Integer questionId){
+    public void deleteQuestion(@PathVariable("questionId") Integer questionId) {
         questionService.deleteById(questionId);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
     @DeleteMapping("answers/{answerId}")
-    public void deleteAnswer(@PathVariable("answerId") Integer answerId){
+    public void deleteAnswer(@PathVariable("answerId") Integer answerId) {
         answerService.deleteById(answerId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("questions/{questionId}/admin")
-    public Question updateQuestionAdmin(@PathVariable("questionId") Integer questionId, @Valid @RequestBody QuestionDtoAdmin questionDtoAdmin){
+    public Question updateQuestionAdmin(@PathVariable("questionId") Integer questionId, @Valid @RequestBody QuestionDtoAdmin questionDtoAdmin) {
         return questionService.updateQuestionAdmin(questionId, questionDtoAdmin);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isQuestionOwner(authentication, #questionId))")
     @PatchMapping("questions/{questionId}")
-    public Question updateQuestion(@PathVariable("questionId") Integer questionId, @Valid @RequestBody QuestionDto questionDto){
+    public Question updateQuestion(@PathVariable("questionId") Integer questionId, @Valid @RequestBody QuestionDto questionDto) {
         return questionService.updateQuestion(questionId, questionDto);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("answers/{answerId}/admin")
-    public Answer updateAnswerAdmin(@PathVariable("answerId") Integer answerId, @Valid @RequestBody AnswerDtoAdmin answerDtoAdmin){
+    public Answer updateAnswerAdmin(@PathVariable("answerId") Integer answerId, @Valid @RequestBody AnswerDtoAdmin answerDtoAdmin) {
         return answerService.updateAnswerAdmin(answerId, answerDtoAdmin);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAnswerOwner(authentication, #answerId))")
     @PatchMapping("answers/{answerId}")
-    public Answer updateAnswer(@PathVariable("answerId") Integer answerId, @Valid @RequestBody AnswerDto answerDto){
+    public Answer updateAnswer(@PathVariable("answerId") Integer answerId, @Valid @RequestBody AnswerDto answerDto) {
         return answerService.updateAnswer(answerId, answerDto);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions/get-by-author/{username}")
-    public List<Question> getQuestionsByAuthor(@PathVariable("username") String username){
+    public List<Question> getQuestionsByAuthor(@PathVariable("username") String username) {
         return this.questionService.getByAuthor(username);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("questions/answered-by/{username}")
-    public List<Question> getQuestionsAnsweredByUser(@PathVariable("username") String username){
+    public List<Question> getQuestionsAnsweredByUser(@PathVariable("username") String username) {
         return this.questionService.getQuestionsAnsweredByUser(username);
     }
 }

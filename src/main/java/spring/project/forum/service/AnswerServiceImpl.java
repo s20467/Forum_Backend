@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import spring.project.forum.api.v1.dto.AnswerDto;
 import spring.project.forum.api.v1.dto.AnswerDtoAdmin;
 import spring.project.forum.api.v1.mapper.AnswerMapper;
-import spring.project.forum.exception.VotingException;
 import spring.project.forum.exception.IncorrectPageableException;
 import spring.project.forum.exception.ResourceNotFoundException;
+import spring.project.forum.exception.VotingException;
 import spring.project.forum.model.Answer;
 import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
@@ -52,8 +52,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAll(pageable);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -69,7 +68,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public void deleteById(Integer answerId) {
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("answer with id " + answerId + "not found"));
-        if(answer.getIsBestAnswer()) {
+        if (answer.getIsBestAnswer()) {
             Question targetQuestion = answer.getTargetQuestion();
             targetQuestion.setBestAnswer(null);
             questionRepository.save(targetQuestion);
@@ -122,9 +121,9 @@ public class AnswerServiceImpl implements AnswerService {
     public Answer upVote(Integer answerId) {
         Answer upVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
         User upVoter = userRepository.findByUsername(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).get();
-        if(upVotedAnswer.getUpVotes().contains(upVoter))
+        if (upVotedAnswer.getUpVotes().contains(upVoter))
             throw new VotingException("User " + upVoter.getUsername() + " already upvoted answer id " + upVotedAnswer.getId());
-        if(upVotedAnswer.getDownVotes().contains(upVoter)){
+        if (upVotedAnswer.getDownVotes().contains(upVoter)) {
             upVoter.getDownVotedAnswers().remove(upVotedAnswer);
             upVotedAnswer.getDownVotes().remove(upVoter);
         }
@@ -137,9 +136,9 @@ public class AnswerServiceImpl implements AnswerService {
     public Answer downVote(Integer answerId) {
         Answer downVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
         User downVoter = userRepository.findByUsername(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).get();
-        if(downVotedAnswer.getDownVotes().contains(downVoter))
+        if (downVotedAnswer.getDownVotes().contains(downVoter))
             throw new VotingException("User " + downVoter.getUsername() + " already downvoted answer id " + downVotedAnswer.getId());
-        if(downVotedAnswer.getUpVotes().contains(downVoter)){
+        if (downVotedAnswer.getUpVotes().contains(downVoter)) {
             downVoter.getUpVotedAnswers().remove(downVotedAnswer);
             downVotedAnswer.getUpVotes().remove(downVoter);
         }
@@ -152,7 +151,7 @@ public class AnswerServiceImpl implements AnswerService {
     public Answer unUpVote(Integer answerId) {
         Answer upVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
         User upVoter = userRepository.findByUsername(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).get();
-        if(!upVotedAnswer.getUpVotes().contains(upVoter))
+        if (!upVotedAnswer.getUpVotes().contains(upVoter))
             throw new VotingException("User " + upVoter.getUsername() + " haven't upvoted answer id " + upVotedAnswer.getId());
         upVoter.getUpVotedAnswers().remove(upVotedAnswer);
         upVotedAnswer.getUpVotes().remove(upVoter);
@@ -163,7 +162,7 @@ public class AnswerServiceImpl implements AnswerService {
     public Answer unDownVote(Integer answerId) {
         Answer downVotedAnswer = answerRepository.findById(answerId).orElseThrow(() -> new ResourceNotFoundException("Answer with id " + answerId + " not found"));
         User downVoter = userRepository.findByUsername(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername()).get();
-        if(!downVotedAnswer.getDownVotes().contains(downVoter))
+        if (!downVotedAnswer.getDownVotes().contains(downVoter))
             throw new VotingException("User " + downVoter.getUsername() + " haven't downvoted answer id " + downVotedAnswer.getId());
         downVoter.getDownVotedAnswers().remove(downVotedAnswer);
         downVotedAnswer.getDownVotes().remove(downVoter);
@@ -182,8 +181,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAllByTargetQuestion(pageable, foundQuestion);
-        }
-        catch(PropertyReferenceException exc){
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }
@@ -200,8 +198,7 @@ public class AnswerServiceImpl implements AnswerService {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by(sortBy));
         try {
             return answerRepository.findAllByAuthor(pageable, foundUser);
-        }
-        catch(PropertyReferenceException exc) {
+        } catch (PropertyReferenceException exc) {
             throw new IncorrectPageableException(exc.getMessage());
         }
     }

@@ -1,6 +1,6 @@
 package spring.project.forum.exception;
 
-public class UsernameAlreadyUsedException extends RuntimeException{
+public class UsernameAlreadyUsedException extends RuntimeException {
     public UsernameAlreadyUsedException() {
     }
 

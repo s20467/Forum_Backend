@@ -3,7 +3,6 @@ package spring.project.forum.service;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import spring.project.forum.api.v1.dto.UserDto;
 import spring.project.forum.api.v1.dto.UserExcludePasswordDto;
-import spring.project.forum.model.Question;
 import spring.project.forum.model.security.User;
 
 import java.util.List;

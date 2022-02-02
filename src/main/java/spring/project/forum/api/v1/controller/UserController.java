@@ -37,43 +37,43 @@ public class UserController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("users")
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return userService.getAll();
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("users/{username}")
-    public User getUser(@PathVariable String username){
+    public User getUser(@PathVariable String username) {
         return userService.getByUsername(username);
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("users/{username}/check-username-availability")
-    public boolean checkUsernameAvailability(@PathVariable("username") String username){
+    public boolean checkUsernameAvailability(@PathVariable("username") String username) {
         return userService.checkUsernameAvailability(username);
     }
 
     @PreAuthorize("permitAll()")
     @PostMapping("users/create")
-    public void createUser(@Valid @RequestBody UserDto userDto){
+    public void createUser(@Valid @RequestBody UserDto userDto) {
         userService.createUser(userDto);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAccountOwner(authentication, #username))")
     @DeleteMapping("users/{username}")
-    public void deleteUser(@PathVariable("username") String username){
+    public void deleteUser(@PathVariable("username") String username) {
         userService.deleteUser(username);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAccountOwner(authentication, #username))")
     @PatchMapping("users/{username}")
-    public void editUserExcludingPassword(@PathVariable("username") String username, @Valid @RequestBody UserExcludePasswordDto userDto){
+    public void editUserExcludingPassword(@PathVariable("username") String username, @Valid @RequestBody UserExcludePasswordDto userDto) {
         userService.editUserExcludingPassword(username, userDto);
     }
 
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @customAuthenticationManager.isAccountOwner(authentication, #username))")
     @PostMapping("users/{username}/change-password")
-    public void editUserPassword(@PathVariable("username") String username, @Valid @RequestBody PasswordDto userPasswordDto){
+    public void editUserPassword(@PathVariable("username") String username, @Valid @RequestBody PasswordDto userPasswordDto) {
         userService.editUserPassword(username, userPasswordDto.getPassword());
     }
 

@@ -8,7 +8,7 @@ import spring.project.forum.model.security.User;
 
 @Component
 @RequiredArgsConstructor
-public class UserMapperImpl implements UserMapper{
+public class UserMapperImpl implements UserMapper {
 
     private final PasswordEncoder passwordEncoder;
 

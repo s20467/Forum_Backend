@@ -37,8 +37,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 } catch (JWTVerificationException exception) {
                     JWTVerificationExceptionHandler.handleJWTVerificationException(exception, request, response);
                 }
-            }
-            else{
+            } else {
                 filterChain.doFilter(request, response);
             }
         } else {

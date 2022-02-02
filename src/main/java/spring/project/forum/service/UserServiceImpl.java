@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(UserDto userDto) {
-        if(userRepository.existsByUsername(userDto.getUsername()))
+        if (userRepository.existsByUsername(userDto.getUsername()))
             throw new UsernameAlreadyUsedException("User with username " + userDto.getUsername() + " already exists");
         return userRepository.save(userMapper.userDtoToUser(userDto));
     }
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
-        if(userOptional.isEmpty())
+        if (userOptional.isEmpty())
             throw new ResourceNotFoundException("User with username " + username + " not found");
         User user = userOptional.get();
         user.getAskedQuestions().forEach(question -> question.setAuthor(null));
@@ -77,11 +77,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User editUserExcludingPassword(String username, UserExcludePasswordDto userDto){
+    public User editUserExcludingPassword(String username, UserExcludePasswordDto userDto) {
         Optional<User> userOptional = userRepository.findByUsername(username);
-        if(userOptional.isEmpty())
+        if (userOptional.isEmpty())
             throw new ResourceNotFoundException("User with username " + username + " not found");
-        if(!username.equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
+        if (!username.equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
             throw new UsernameAlreadyUsedException("User with username " + userDto.getUsername() + " already exists");
         User user = userOptional.get();
         user.setUsername(userDto.getUsername());
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editUserPassword(String username, String newPassword) {
         Optional<User> userOptional = userRepository.findByUsername(username);
-        if(userOptional.isEmpty())
+        if (userOptional.isEmpty())
             throw new ResourceNotFoundException("User with username " + username + " not found");
         User user = userOptional.get();
         user.setPassword(passwordEncoder.encode(newPassword));

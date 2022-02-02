@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import spring.project.forum.api.v1.dto.QuestionDto;
 import spring.project.forum.api.v1.dto.QuestionDtoAdmin;
 import spring.project.forum.model.Question;
+
 import java.util.List;
 
 public interface QuestionService {

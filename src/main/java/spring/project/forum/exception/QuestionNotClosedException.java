@@ -1,6 +1,6 @@
 package spring.project.forum.exception;
 
-public class QuestionNotClosedException extends RuntimeException{
+public class QuestionNotClosedException extends RuntimeException {
     public QuestionNotClosedException() {
     }
 

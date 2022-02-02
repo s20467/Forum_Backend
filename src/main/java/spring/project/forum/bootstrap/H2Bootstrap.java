@@ -33,7 +33,7 @@ public class H2Bootstrap implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if(userRepository.count() != 0 || questionRepository.count() != 0 || answerRepository.count() != 0)
+        if (userRepository.count() != 0 || questionRepository.count() != 0 || answerRepository.count() != 0)
             return;
 
         Authority userRoleAuthority = Authority.builder().name("ROLE_USER").build();
@@ -164,7 +164,6 @@ public class H2Bootstrap implements CommandLineRunner {
                 .createdAt(LocalDate.now())
                 .author(u2)
                 .build();
-
 
 
 //        Question q2 = Question.builder()

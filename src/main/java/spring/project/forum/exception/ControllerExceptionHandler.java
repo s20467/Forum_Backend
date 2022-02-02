@@ -12,24 +12,27 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
-    public void handleResourceNotFoundException(ResourceNotFoundException exc, WebRequest webRequest){}
+    public void handleResourceNotFoundException(ResourceNotFoundException exc, WebRequest webRequest) {
+    }
 
     @ExceptionHandler(QuestionAlreadyClosedException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Question already closed")
-    public void handleQuestionAlreadyClosedException(QuestionAlreadyClosedException exc, WebRequest webRequest){}
+    public void handleQuestionAlreadyClosedException(QuestionAlreadyClosedException exc, WebRequest webRequest) {
+    }
 
     @ExceptionHandler(QuestionNotClosedException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Question not closed")
-    public void handleQuestionNotClosedException(QuestionNotClosedException exc, WebRequest webRequest){}
+    public void handleQuestionNotClosedException(QuestionNotClosedException exc, WebRequest webRequest) {
+    }
 
     @ExceptionHandler(IncorrectPageableException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Incorrect pagination arguments")
-    public void handleIncorrectPageableException(IncorrectPageableException exc, WebRequest webRequest){
+    public void handleIncorrectPageableException(IncorrectPageableException exc, WebRequest webRequest) {
     }
 
     @ExceptionHandler(UsernameAlreadyUsedException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Username already in use")
-    public void handleUsernameAlreadyUsedException(UsernameAlreadyUsedException exc, WebRequest webRequest){
+    public void handleUsernameAlreadyUsedException(UsernameAlreadyUsedException exc, WebRequest webRequest) {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

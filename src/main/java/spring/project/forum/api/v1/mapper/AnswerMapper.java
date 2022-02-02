@@ -22,9 +22,9 @@ public interface AnswerMapper {
     Answer answerDtoAdminToAnswer(AnswerDtoAdmin answerDto);
 
     @Named("stringToLocalDate")
-    public static LocalDate stringToLocalDate(String date){
+    public static LocalDate stringToLocalDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if(date == null)
+        if (date == null)
             return null;
         return LocalDate.parse(date, formatter);
     }
