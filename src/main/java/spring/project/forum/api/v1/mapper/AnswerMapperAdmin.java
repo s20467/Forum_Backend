@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import spring.project.forum.api.v1.dto.AnswerDto;
 import spring.project.forum.api.v1.dto.AnswerDtoAdmin;
 import spring.project.forum.model.Answer;
 
@@ -12,10 +11,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Mapper
-public interface AnswerMapper {
-    AnswerMapper INSTANCE = Mappers.getMapper(AnswerMapper.class);
-
-    Answer answerDtoToAnswer(AnswerDto answerDto);
+public interface AnswerMapperAdmin {
+    AnswerMapperAdmin INSTANCE = Mappers.getMapper(AnswerMapperAdmin.class);
 
     @Mapping(target = "author", ignore = true)
     @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "stringToLocalDate")

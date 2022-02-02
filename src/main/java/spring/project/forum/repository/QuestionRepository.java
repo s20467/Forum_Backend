@@ -17,4 +17,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     Page<Question> findAllByBestAnswerIsNull(Pageable pageable);
 
+    List<Question> findAllByClosedAtIsNull();
+
 }

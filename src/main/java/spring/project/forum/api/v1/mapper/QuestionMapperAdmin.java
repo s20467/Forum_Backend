@@ -4,22 +4,22 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import spring.project.forum.api.v1.dto.AnswerDto;
-import spring.project.forum.api.v1.dto.AnswerDtoAdmin;
-import spring.project.forum.model.Answer;
+import spring.project.forum.api.v1.dto.QuestionDtoAdmin;
+import spring.project.forum.model.Question;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Mapper
-public interface AnswerMapper {
-    AnswerMapper INSTANCE = Mappers.getMapper(AnswerMapper.class);
-
-    Answer answerDtoToAnswer(AnswerDto answerDto);
+public interface QuestionMapperAdmin {
+    QuestionMapperAdmin INSTANCE = Mappers.getMapper(QuestionMapperAdmin.class);
 
     @Mapping(target = "author", ignore = true)
     @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "stringToLocalDate")
-    Answer answerDtoAdminToAnswer(AnswerDtoAdmin answerDto);
+    @Mapping(source = "closedAt", target = "closedAt", qualifiedByName = "stringToLocalDate")
+    Question questionDtoAdminToQuestion(QuestionDtoAdmin questionDtoAdmin);
+
+
 
     @Named("stringToLocalDate")
     public static LocalDate stringToLocalDate(String date){

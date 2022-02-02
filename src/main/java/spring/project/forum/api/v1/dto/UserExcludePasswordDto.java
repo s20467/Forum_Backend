@@ -12,11 +12,9 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuestionDto {
+public class UserExcludePasswordDto {
 
-    @NotBlank(message = "Title is mandatory")
-    @Size(min = 10, max = 255, message = "Title must be at least 10 characters long")
-    String title;
-
-    String content;
+    @NotBlank(message = "Password is mandatory")
+    @Size(min = 5, max = 20, message = "Password must be 5-20 characters long")
+    String username;
 }
