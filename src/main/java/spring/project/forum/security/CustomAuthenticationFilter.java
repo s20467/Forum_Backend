@@ -48,7 +48,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         User user = (User) authResult.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256("secret");
 
-        String access_token = jwtService.getStringTokenFromUser(user, (10L * 60 * 1000), request.getRequestURI(), true);
+        String access_token = jwtService.getStringTokenFromUser(user, (60L * 60 * 1000), request.getRequestURI(), true);
 
         String refresh_token = jwtService.getStringTokenFromUser(user, (24L * 60 * 60 * 1000), request.getRequestURI(), false);
 

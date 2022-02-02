@@ -31,4 +31,9 @@ public class CustomAuthenticationManager {
         User authenticatedUser = (User) authentication.getPrincipal();
         return foundAnswer.getAuthor().getUsername().equals(authenticatedUser.getUsername());
     }
+
+    public boolean isAccountOwner(Authentication authentication, String username) {
+        User authenticatedUser = (User) authentication.getPrincipal();
+        return username.equals(authenticatedUser.getUsername());
+    }
 }
